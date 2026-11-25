@@ -25,6 +25,7 @@
 }
 * { box-sizing: border-box; }
 html, body { height: 100%; margin: 0; }
+@supports (height: 100dvh) { body { height: 100dvh; } }   /* iPad/iPhone: Höhe ohne Safari-Leisten */
 body { background: var(--bg); color: var(--ink); font: 15px/1.45 var(--f-ui); display: grid; grid-template-rows: auto 1fr auto; overflow: hidden; }
 button, input, select, textarea { font: inherit; color: inherit; }
 button { cursor: pointer; }
@@ -33,6 +34,10 @@ button { cursor: pointer; }
 .lbl { font: 600 11.5px var(--f-ui); letter-spacing: .07em; text-transform: uppercase; color: var(--muted); }
 .grow { flex: 1; min-width: 0; }
 [hidden] { display: none !important; }
+/* Touch: Scrollbereiche gezielt freigeben, kein Mitziehen der ganzen Seite */
+#code, .plist, .msglist, .scroll, .exlist, .helpdock, .helpwrap, .gutter { -webkit-overflow-scrolling: touch; overscroll-behavior: contain; touch-action: pan-x pan-y; }
+.key, .sk, .btn, .pill, .typ, .vb { touch-action: manipulation; -webkit-tap-highlight-color: transparent; }
+.key, .sk { -webkit-user-select: none; user-select: none; -webkit-touch-callout: none; }
 
 /* Statuszeile */
 .top { background: var(--top); color: #fff; display: flex; align-items: center; gap: 18px; padding: 0 16px; height: 50px; min-width: 0; }
@@ -229,7 +234,7 @@ main { min-height: 0; position: relative; }
 #timeline { flex: 1; accent-color: var(--accent); }
 #timeTxt, #vol { font: 500 13.5px var(--f-mono); color: var(--muted); white-space: nowrap; font-variant-numeric: tabular-nums; }
 .speed { display: flex; align-items: center; gap: 6px; font-size: 13.5px; color: var(--muted); }
-select { background: #fff; border: 1px solid var(--line-2); border-radius: 5px; padding: 6px 8px; }
+select { background: #fff; border: 1px solid var(--line-2); border-radius: 5px; padding: 6px 8px; font-size: 16px; }
 
 /* Einrichten: Tabellen & Felder */
 table.grid { width: 100%; border-collapse: collapse; }
@@ -311,16 +316,26 @@ table.grid { width: 100%; border-collapse: collapse; }
 .dlg .wfoot { justify-content: flex-end; }
 
 @media (max-width: 1150px) {
-  body { overflow: auto; }
-  main { min-height: 900px; }
-  .cols { flex-direction: column; }
+  /* Hochformat (z. B. iPad): Seite scrollt als Ganzes, Statuszeile und Softkeys bleiben stehen */
+  html, body { height: auto; }
+  body { display: block; overflow: visible; height: auto !important; }
+  .top { position: sticky; top: 0; z-index: 10; }
+  .softkeys { position: sticky; bottom: 0; z-index: 10; grid-template-columns: repeat(4, minmax(0, 1fr)); }
+  .softkeys .gap { display: none; }
+  main { min-height: 0; }
+  .screen { position: relative; inset: auto; }
+  .cols { flex-direction: column; flex: none; }
   .rcol, .listwin { width: auto !important; }
-  .listwin { max-height: 220px; }
-  .simview { min-height: 380px; }
+  .rcol > .win, .cols > .win { flex: none !important; }
+  .progwin .editor { height: 52vh; flex: none; }
+  .helpdock { max-height: 380px; }
+  .msglist { max-height: 220px; }
+  .listwin .plist { max-height: 240px; }
+  .simview .vslot { height: 58vh; min-height: 360px; flex: none; }
+  .cols > .win .scroll { max-height: 55vh; }
+  #cornerSvg { min-height: 340px; }
   .keys { flex-wrap: wrap; }
   .kblock { flex: 1 1 100%; }
-  .softkeys { grid-template-columns: repeat(4, minmax(0, 1fr)); }
-  .softkeys .gap { display: none; }
 }
 </style>
 </head>
@@ -522,11 +537,11 @@ table.grid { width: 100%; border-collapse: collapse; }
           <div class="wh">Rohteil</div>
           <div class="pad">
             <div class="fgrid">
-              <label class="fld" style="grid-column:1/-1"><span class="lbl">Länge L (X)</span><span class="field"><input id="stL" type="number" step="any" min="1"><em>mm</em></span></label>
-              <label class="fld"><span class="lbl">Breite B (Y)</span><span class="field"><input id="stB" type="number" step="any" min="1"><em>mm</em></span></label>
-              <label class="fld"><span class="lbl">Höhe H (Z)</span><span class="field"><input id="stH" type="number" step="any" min="0.5"><em>mm</em></span></label>
-              <label class="fld"><span class="lbl">Lage X (MKS)</span><span class="field"><input id="stX" type="number" step="any"><em>mm</em><button class="rst" type="button" data-rst="stX" title="Lage X auf Standardwert zurücksetzen" aria-label="Lage X auf Standardwert zurücksetzen"><svg viewBox="0 0 16 16" width="16" height="16" aria-hidden="true"><path d="M3 8a5 5 0 1 0 1.5-3.6M3 2v3h3" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg></button></span></label>
-              <label class="fld"><span class="lbl">Lage Y (MKS)</span><span class="field"><input id="stY" type="number" step="any"><em>mm</em><button class="rst" type="button" data-rst="stY" title="Lage Y auf Standardwert zurücksetzen" aria-label="Lage Y auf Standardwert zurücksetzen"><svg viewBox="0 0 16 16" width="16" height="16" aria-hidden="true"><path d="M3 8a5 5 0 1 0 1.5-3.6M3 2v3h3" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg></button></span></label>
+              <label class="fld" style="grid-column:1/-1"><span class="lbl">Länge L (X)</span><span class="field"><input id="stL" type="number" step="any" inputmode="decimal" min="1"><em>mm</em></span></label>
+              <label class="fld"><span class="lbl">Breite B (Y)</span><span class="field"><input id="stB" type="number" step="any" inputmode="decimal" min="1"><em>mm</em></span></label>
+              <label class="fld"><span class="lbl">Höhe H (Z)</span><span class="field"><input id="stH" type="number" step="any" inputmode="decimal" min="0.5"><em>mm</em></span></label>
+              <label class="fld"><span class="lbl">Lage X (MKS)</span><span class="field"><input id="stX" type="number" step="any" inputmode="decimal"><em>mm</em><button class="rst" type="button" data-rst="stX" title="Lage X auf Standardwert zurücksetzen" aria-label="Lage X auf Standardwert zurücksetzen"><svg viewBox="0 0 16 16" width="16" height="16" aria-hidden="true"><path d="M3 8a5 5 0 1 0 1.5-3.6M3 2v3h3" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg></button></span></label>
+              <label class="fld"><span class="lbl">Lage Y (MKS)</span><span class="field"><input id="stY" type="number" step="any" inputmode="decimal"><em>mm</em><button class="rst" type="button" data-rst="stY" title="Lage Y auf Standardwert zurücksetzen" aria-label="Lage Y auf Standardwert zurücksetzen"><svg viewBox="0 0 16 16" width="16" height="16" aria-hidden="true"><path d="M3 8a5 5 0 1 0 1.5-3.6M3 2v3h3" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg></button></span></label>
             </div>
             <div class="fld"><span class="lbl">Werkstoff (Farbe)</span>
               <div class="pills" id="matPills">
@@ -541,14 +556,14 @@ table.grid { width: 100%; border-collapse: collapse; }
           <div class="wh">Maschine</div>
           <div class="scroll"><div class="pad">
             <div class="fgrid">
-              <label class="fld"><span class="lbl">Eilgang</span><span class="field"><input id="mRapid" type="number" step="any"><em>mm/min</em></span></label>
-              <label class="fld"><span class="lbl">max. Drehzahl</span><span class="field"><input id="mMaxRpm" type="number" step="any"><em>1/min</em></span></label>
+              <label class="fld"><span class="lbl">Eilgang</span><span class="field"><input id="mRapid" type="number" step="any" inputmode="decimal"><em>mm/min</em></span></label>
+              <label class="fld"><span class="lbl">max. Drehzahl</span><span class="field"><input id="mMaxRpm" type="number" step="any" inputmode="decimal"><em>1/min</em></span></label>
             </div>
             <span class="lbl">Startpunkt / Werkzeugwechsel (MKS)</span>
             <div class="fgrid c3">
-              <label class="fld"><span class="lbl">X</span><span class="field"><input id="mTcpX" type="number" step="any"></span></label>
-              <label class="fld"><span class="lbl">Y</span><span class="field"><input id="mTcpY" type="number" step="any"></span></label>
-              <label class="fld"><span class="lbl">Z</span><span class="field"><input id="mTcpZ" type="number" step="any"></span></label>
+              <label class="fld"><span class="lbl">X</span><span class="field"><input id="mTcpX" type="number" step="any" inputmode="decimal"></span></label>
+              <label class="fld"><span class="lbl">Y</span><span class="field"><input id="mTcpY" type="number" step="any" inputmode="decimal"></span></label>
+              <label class="fld"><span class="lbl">Z</span><span class="field"><input id="mTcpZ" type="number" step="any" inputmode="decimal"></span></label>
             </div>
             <label class="fld"><span class="lbl">Auflösung Werkstück</span><select id="mRes"><option value="200">grob (schnell)</option><option value="360">mittel</option><option value="560">fein</option><option value="800">sehr fein (langsamer)</option></select></label>
           </div></div>
@@ -706,7 +721,7 @@ table.grid { width: 100%; border-collapse: collapse; }
         <tr><td>Mausrad</td><td>zoomen (Touch: zwei Finger)</td></tr>
         <tr><td>Leertaste</td><td>Zyklus-Start / Halt im Bildschirm Simulation</td></tr>
         <tr><td>Strg + S</td><td>Projektdatei speichern (Programm und Einrichtdaten in einer .json-Datei)</td></tr>
-        <tr><td>Eingabezeile</td><td>zeigt den Satz unter dem Cursor. Tippen oder das Tastenfeld ändern ihn sofort, Enter bzw. „Satz übernehmen“ legt den nächsten Satz mit fortlaufender Satznummer an.</td></tr>
+        <tr><td>Eingabezeile</td><td>zeigt den Satz unter dem Cursor. Tippen oder das Tastenfeld ändern ihn sofort, Enter bzw. „Satz übernehmen“ legt den nächsten Satz mit fortlaufender Satznummer an. Auf dem Tablet fährt die Bildschirmtastatur nur aus, wenn das Tastenfeld ausgeblendet ist.</td></tr>
         <tr><td>Programmliste</td><td>Klick auf einen Satz in der Simulation springt an dessen Anfang (Satzvorlauf).</td></tr>
         <tr><td>Zeitleiste</td><td>vor- und zurückspulen, das Rohteil wird neu berechnet</td></tr>
       </table>
@@ -2728,7 +2743,7 @@ const CMDHELP = (() => {
       `<div class="kblock n4">${KEYS.n.map(k => keyBtn(k, 'kn')).join('')}<button class="key kgo wide" type="button" data-key="enter">Satz übernehmen</button></div>`;
   }
   renderKeys();
-  $('keys').addEventListener('pointerdown', e => { if (e.target.closest('.key')) e.preventDefault(); });
+  $('keys').addEventListener('pointerdown', e => { if (e.pointerType === 'mouse' && e.target.closest('.key')) e.preventDefault(); });   // nur Maus: Fokus halten; Touch darf scrollen
   $('keys').addEventListener('click', e => {
     const b = e.target.closest('[data-key]'); if (!b) return;
     if (b._long) { b._long = false; return; }
@@ -2757,6 +2772,8 @@ const CMDHELP = (() => {
   function applyUiToggles() {
     $('keys').hidden = !S.ui.keys;
     $('btnKeysTog').setAttribute('aria-pressed', String(!!S.ui.keys));
+    // Tablet: Bei eingeblendetem Tastenfeld keine Bildschirmtastatur ausfahren (Cursor bleibt sichtbar)
+    inp.inputMode = ta.inputMode = S.ui.keys ? 'none' : 'text';
     updateHelp();
   }
   $('btnKeysTog').addEventListener('click', () => { S.ui.keys = !S.ui.keys; saveState(); applyUiToggles(); });
@@ -3222,7 +3239,7 @@ const CMDHELP = (() => {
       $('tdState').textContent = this.dirty ? 'geändert – noch nicht übernommen' : 'wird bearbeitet';
       $('tdSketch').innerHTML = toolSketch(t);
       $('tdTypes').innerHTML = Object.keys(TOOL_TYPES).map(k => `<button class="typ" type="button" data-type="${k}" aria-pressed="${k === t.type}" title="${TOOL_TYPES[k].label}"><svg width="26" height="30" viewBox="0 0 26 30" aria-hidden="true" style="color:${k === t.type ? toolColor(t.nr) : '#8f99a4'}">${TYPE_ICON[k]}</svg>${TYPE_SHORT[k]}</button>`).join('');
-      const fld = (k, lbl, unit, val, type = 'number', extra = '') => `<label class="fld"${extra}><span class="lbl">${lbl}</span><span class="field"><input data-k="${k}" type="${type}" ${type === 'number' ? 'step="any" min="0"' : ''} value="${esc(val)}">${unit ? `<em>${unit}</em>` : ''}</span></label>`;
+      const fld = (k, lbl, unit, val, type = 'number', extra = '') => `<label class="fld"${extra}><span class="lbl">${lbl}</span><span class="field"><input data-k="${k}" type="${type}" ${type === 'number' ? 'step="any" min="0" inputmode="none"' : ''} value="${esc(val)}">${unit ? `<em>${unit}</em>` : ''}</span></label>`;
       $('tdFields').innerHTML = fld('nr', 'T-Nummer', '', t.nr) + fld('name', 'Bezeichnung', '', t.name, 'text') +
         TOOL_TYPES[t.type].fields.map(f => fld(f, FIELD[f][0], FIELD[f][1], t[f])).join('');
       this.hint();
@@ -3334,7 +3351,7 @@ const CMDHELP = (() => {
   }));
   const KP = ['7', '8', '9', '⌫', '4', '5', '6', '−', '1', '2', '3', '.', '0', 'C'];
   $('kpTools').innerHTML = KP.map(k => keyBtn(k, 'kn')).join('') + '<button class="key kgo wide" type="button" data-key="next">Wert übernehmen</button>';
-  $('kpTools').addEventListener('pointerdown', e => { if (e.target.closest('.key')) e.preventDefault(); });
+  $('kpTools').addEventListener('pointerdown', e => { if (e.pointerType === 'mouse' && e.target.closest('.key')) e.preventDefault(); });   // nur Maus: Fokus halten; Touch darf scrollen
   $('kpTools').addEventListener('click', e => {
     const b = e.target.closest('[data-key]'); if (!b) return;
     const el = TOOLED.lastField && document.body.contains(TOOLED.lastField) ? TOOLED.lastField : $('tdFields').querySelector('input[data-k="D"]') || $('tdFields').querySelector('input');
