@@ -35,7 +35,8 @@ button { cursor: pointer; }
 .grow { flex: 1; min-width: 0; }
 [hidden] { display: none !important; }
 /* Touch: Scrollbereiche gezielt freigeben, kein Mitziehen der ganzen Seite */
-.plist, .msglist, .scroll, .exlist, .helpdock, .helpwrap, .gutter { -webkit-overflow-scrolling: touch; overscroll-behavior: contain; touch-action: pan-x pan-y; }
+.plist, .msglist, .exlist, .helpdock, .helpwrap { overscroll-behavior: contain; touch-action: none; }
+.scroll { -webkit-overflow-scrolling: touch; overscroll-behavior: contain; touch-action: pan-x pan-y; }
 .key, .sk, .btn, .pill, .typ, .vb { touch-action: manipulation; -webkit-tap-highlight-color: transparent; }
 .key, .sk { -webkit-user-select: none; user-select: none; -webkit-touch-callout: none; }
 
@@ -106,7 +107,7 @@ main { min-height: 0; position: relative; }
 
 /* Programm-Editor */
 .progwin { flex: 1; }
-.editor { flex: 1; min-height: 120px; display: block; position: relative; overflow: auto; background: #fff; -webkit-overflow-scrolling: touch; overscroll-behavior: contain; touch-action: pan-x pan-y; }
+.editor { flex: 1; min-height: 120px; display: block; position: relative; overflow: auto; background: #fff; overscroll-behavior: contain; touch-action: none; }
 .edrow { display: flex; min-height: 100%; min-width: 100%; width: max-content; }
 .gutter { width: 58px; flex: none; background: var(--win-2); border-right: 1px solid var(--line); position: sticky; left: 0; z-index: 2; }
 .gutter-inner, .hl-inner { padding: 6px 0; will-change: transform; }
@@ -143,7 +144,7 @@ main { min-height: 0; position: relative; }
 .ch-p { flex: 1; display: grid; grid-template-columns: auto 1fr; row-gap: 4px; column-gap: 10px; font-size: 13.5px; line-height: 1.3; align-content: start; }
 .ch-p .a { font: 600 13.5px var(--f-mono); color: var(--blue); white-space: nowrap; }
 .ch-p .a.have { color: var(--ok); }
-.cmdhelp .a.req { justify-self: start; border: 2px solid #1c232b; border-radius: 4px; padding: 0 5px; line-height: 1.35; }
+.ch-p .a.req, .cmdhelp .a.req { justify-self: start; border: 2px solid #1c232b; border-radius: 4px; padding: 0 5px; line-height: 1.35; }
 .ch-note .a.req { font: 600 11px var(--f-mono); color: var(--ink); padding: 0 4px; margin-right: 2px; border-width: 1.5px; }
 .ch-p .a.have::after { content: " ✓"; }
 .ch-note { font-size: 13px; color: var(--muted); padding: 0 12px 8px; }
@@ -185,9 +186,6 @@ main { min-height: 0; position: relative; }
 .vb:hover { background: var(--win-2); }
 .vb[aria-pressed="true"] { background: var(--accent-soft); color: var(--accent-2); border-color: var(--accent-line); }
 .vsep { width: 1px; background: var(--line-2); margin: 2px 3px; }
-.panbtn { right: 8px; top: 8px; display: none; align-items: center; gap: 6px; padding: 6px 10px; font: 600 13px var(--f-ui); color: var(--ink-2); touch-action: manipulation; }
-.panbtn[aria-pressed="true"] { background: var(--accent); color: #fff; border-color: var(--accent); }
-@media (pointer: coarse), (any-pointer: coarse) { .panbtn:not([hidden]) { display: inline-flex; } }
 .legend { right: 8px; bottom: 8px; padding: 4px 9px; display: flex; gap: 10px; font: 12px var(--f-mono); color: var(--ink-2); }
 .legend i { display: inline-block; width: 14px; height: 0; border-top: 2px solid; vertical-align: middle; margin-right: 4px; }
 .small .legend { display: none; }
@@ -283,6 +281,14 @@ table.grid { width: 100%; border-collapse: collapse; }
 .pill { font: 600 14px var(--f-ui); padding: 8px 13px; border-radius: 6px; border: 1px solid var(--line-2); background: #fff; color: var(--ink); }
 .pill[aria-pressed="true"] { border: 2px solid var(--accent); background: var(--accent-soft); padding: 7px 12px; }
 .pills { display: flex; gap: 6px; flex-wrap: wrap; }
+.tdleft { flex: none; width: 214px; display: flex; flex-direction: column; gap: 12px; }
+.hintbox.tdhint { margin: 0 14px 12px; border: 1px solid var(--blue-line); border-radius: 6px; }
+.hintbox.tdhint.warn { border-color: var(--accent-line); }
+.colrow { display: flex; gap: 6px; flex-wrap: wrap; align-items: center; }
+.csw { width: 30px; height: 30px; border-radius: 6px; border: 1px solid rgba(0,0,0,.25); cursor: pointer; }
+.csw[aria-pressed="true"] { outline: 3px solid var(--ink); outline-offset: 2px; }
+.cpick { display: inline-flex; align-items: center; gap: 6px; font: 600 13px var(--f-ui); color: var(--muted); cursor: pointer; margin-left: 4px; }
+.cpick input { width: 34px; height: 30px; padding: 0; border: 1px solid var(--line-2); border-radius: 6px; background: none; cursor: pointer; }
 .pills.g4 { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); }
 .pad { padding: 14px; display: flex; flex-direction: column; gap: 12px; }
 .note { font-size: 13.5px; line-height: 1.45; color: var(--ink-2); background: var(--win-2); border-radius: 6px; padding: 10px 12px; margin: 0; }
@@ -456,14 +462,15 @@ table.grid { width: 100%; border-collapse: collapse; }
                   <button class="vb" type="button" id="btnPath" aria-pressed="true">Bahn</button>
                   <button class="vb" type="button" id="btnMachine" aria-pressed="true" hidden>Maschine</button>
                   <button class="vb" type="button" id="btnTable" aria-pressed="true" hidden>Tisch</button>
-                  <button class="vb" type="button" id="btnWks" aria-pressed="true" hidden>Werkstück-KS</button>
+                  <button class="vb" type="button" id="btnWks" aria-pressed="true" hidden title="Maschinennullpunkt M und Werkstücknullpunkt W mit Achsen">Koordinatensysteme</button>
+                  <button class="vb" type="button" id="btnCols" aria-pressed="true" hidden>Werkzeugfarben</button>
+                  <button class="vb" type="button" id="btnChips" aria-pressed="true" hidden>Späne</button>
+                  <button class="vb" type="button" id="btnCool" aria-pressed="true" hidden>Kühlmittel</button>
+                  <button class="vb" type="button" id="btnSound" aria-pressed="true">Ton</button>
                   <button class="vb" type="button" id="btnOrtho" aria-pressed="false">Parallel</button>
                 </div>
               </div>
             </div>
-            <button class="overlay panbtn" id="btnPanMode" type="button" aria-pressed="false" hidden title="Ein Finger verschiebt den Ausschnitt statt zu drehen">
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 2v20M2 12h20M12 2l-3 3M12 2l3 3M12 22l-3-3M12 22l3-3M2 12l3-3M2 12l3 3M22 12l-3-3M22 12l-3 3"/></svg>
-              <span>Verschieben</span></button>
             <div class="overlay legend" aria-hidden="true">
               <span><i style="border-top:2px dashed #e6474d"></i>G0</span>
               <span><i style="border-color:#12b887"></i>G1</span>
@@ -561,15 +568,18 @@ table.grid { width: 100%; border-collapse: collapse; }
           <div class="wh"><span class="grow" id="tdTitle">T1</span><span class="info hot" id="tdState"></span></div>
           <div class="scroll">
             <div style="display:flex; gap:14px; padding:12px 14px">
-              <div id="tdSketch" style="flex:none"></div>
+              <div class="tdleft">
+                <div id="tdSketch"></div>
+                <div id="tdColor"></div>
+              </div>
               <div style="flex:1; display:flex; flex-direction:column; gap:8px; min-width:0">
                 <span class="lbl">Typ</span>
                 <div class="typs" id="tdTypes"></div>
                 <div class="fgrid" id="tdFields" style="margin-top:4px"></div>
               </div>
             </div>
+            <div class="hintbox tdhint" id="tdHint"></div>
           </div>
-          <div class="hintbox" id="tdHint"></div>
         </div>
         <div class="kp" id="kpTools"></div>
       </div>
@@ -595,6 +605,11 @@ table.grid { width: 100%; border-collapse: collapse; }
                 <button class="pill" type="button" data-mat="alu">Aluminium</button>
                 <button class="pill" type="button" data-mat="steel">Stahl</button>
                 <button class="pill" type="button" data-mat="pom">Kunststoff</button>
+              </div></div>
+            <div class="fld"><span class="lbl">Spannmittel</span>
+              <div class="pills" id="clampPills">
+                <button class="pill" type="button" data-vise="0">Parallelunterlagen</button>
+                <button class="pill" type="button" data-vise="1">Schraubstock</button>
               </div></div>
             <p class="note" id="stockNote"></p>
           </div>
@@ -732,15 +747,18 @@ table.grid { width: 100%; border-collapse: collapse; }
       </table></div></section>
 <section class="win hsec"><div class="wh">Bearbeitungszyklen (Definition)</div><div class="hbody"><table>
         <tr><td>gemeinsam</td><td><code>ZA</code> Tiefe absolut oder <code>ZI</code> ab Materialoberfläche, <code>V</code> Sicherheitsabstand über der Oberfläche, <code>W</code> Rückzugsebene absolut, <code>E</code> Eintauch- bzw. Anbohrvorschub</td></tr>
-        <tr><td>G72</td><td>Rechtecktasche: <code>LP BP</code> Länge/Breite, <code>RN</code> Eckenradius, <code>D</code> Zustellung, <code>AK AL</code> Aufmaß Rand/Boden, <code>H1</code> Schruppen, <code>H4</code> Schlichten, <code>H14</code> beides, <code>EP0</code> Bezug Mitte, <code>EP1</code> Bezug Ecke links unten</td></tr>
-        <tr><td>G73</td><td>Kreistasche: <code>R</code> Radius, optional Zapfen <code>RZ</code>, sonst wie G72</td></tr>
-        <tr><td>G74</td><td>Nut mit runden Enden: <code>LP BP</code>, <code>EP0</code> Mitte, <code>EP1</code> Mittelpunkt des linken Bogens</td></tr>
+        <tr><td>G72</td><td>Rechtecktasche: <code>LP BP</code> Länge/Breite, <code>RN</code> Eckenradius, <code>D</code> Zustellung, <code>AK AL</code> Aufmaß Rand/Boden, <code>H1</code> Schruppen, <code>H4</code> Schlichten, <code>H14</code> beides, Setzpunkt <code>EP0</code> Mitte (Standard), <code>EP1</code> rechts oben, <code>EP2</code> links oben, <code>EP3</code> links unten, <code>EP4</code> rechts unten. Zapfen: <code>LZ BZ</code> Länge/Breite, <code>RZ</code> Verrundung, <code>HA</code>/<code>HI</code> Zapfenhöhe absolut/ab Boden</td></tr>
+        <tr><td>G72–G75 Optionen</td><td><code>QM1</code> ohne Stufen (Standard), <code>QM2</code> mit Stufe <code>BA</code> Breite / <code>WA</code> Tiefe am Rand, <code>QM-1</code> Fasen der Oberkanten mit <code>CB</code> Fasenbreite und <code>CM</code> Arbeitspunkt auf der Schneide in % (Fas- oder Zentrierwerkzeug), <code>RM</code> Mindestradius der Schruppbahnen in % des Fräserdurchmessers</td></tr>
+        <tr><td>G73</td><td>Kreistasche: <code>R</code> Radius, optional Zapfen <code>RZ</code> mit Höhe <code>HA</code>/<code>HI</code>, sonst wie G72</td></tr>
+        <tr><td>G74</td><td>Nut mit runden Enden: <code>LP BP</code>, Setzpunkt <code>EP3</code> linker Bogenmittelpunkt (Standard), <code>EP0</code> Mitte, <code>EP1</code> rechter Bogenmittelpunkt</td></tr>
         <tr><td>G75</td><td>Kreisbogennut: <code>BP</code> Breite, <code>RP</code> Radius der Nutmitte, <code>AN</code> Startwinkel, <code>AO</code> Öffnungswinkel oder <code>AP</code> Endwinkel</td></tr>
         <tr><td>G81</td><td>Bohren</td></tr>
         <tr><td>G82</td><td>Tiefbohren mit Spanbruch: <code>D</code> Zustellung, optional <code>DR</code> Reduzierwert, <code>DM</code> Mindestzustellung, <code>DA</code> Anbohrtiefe, <code>VB</code> Rückzug, <code>U</code> Verweilzeit</td></tr>
         <tr><td>G83</td><td>Tiefbohren mit Entspanen (wie G82, Rückzug auf Sicherheitsabstand)</td></tr>
         <tr><td>G84</td><td>Gewindebohren: <code>F</code> Steigung in mm/U, <code>M3/M4</code> Drehrichtung</td></tr>
         <tr><td>G85 / G86</td><td>Reiben (<code>E</code> Rückzugsvorschub) / Ausdrehen</td></tr>
+        <tr><td>G87</td><td>Bohrfräsen: <code>R</code> Bohrungsradius, <code>D</code> Zustellung je Schraubenlinie, <code>BG2</code>/<code>BG3</code> im/gegen den Uhrzeigersinn; am Grund ein Vollkreis</td></tr>
+        <tr><td>G88</td><td>Innengewindefräsen: <code>DN</code> Nenndurchmesser, <code>D</code> Steigung (<code>D+</code> von oben, <code>D−</code> von unten), <code>Q</code> Gewinderillen des Fräsers, <code>BG</code> Richtung. Rechtsgewinde: BG2 mit D+ oder BG3 mit D−</td></tr>
         <tr><td>G80</td><td>Zyklusdefinition löschen</td></tr>
       </table></div></section>
 <section class="win hsec"><div class="wh">Zyklusaufrufe</div><div class="hbody"><table>
@@ -760,9 +778,10 @@ table.grid { width: 100%; border-collapse: collapse; }
         <tr><td>M0 / M1</td><td>programmierter Halt (weiter mit Start) / wahlweiser Halt (übergangen)</td></tr>
         <tr><td>M17 / M30</td><td>Unterprogrammende / Programmende</td></tr>
       </table></div></section>
-<section class="win hsec"><div class="wh">Noch nicht enthalten</div><div class="hbody"><p>Schwenken G15/G16 (Mehrseitenbearbeitung), Konturtaschenzyklus G34–G39, Gewindefräsen G88/G89, bei G72/G73 Zapfen- und Stufenoptionen (LZ, BZ, HA/HI, QM, BA, WA, RM) sowie Werkzeuglängenkorrektur TL. Die Werte für EP, O1/O2 und G14 H sind wie oben festgelegt – bitte mit der Prüfungsunterlage abgleichen.</p></div></section>
+<section class="win hsec"><div class="wh">Noch nicht enthalten</div><div class="hbody"><p>Schwenken der Bearbeitungsebene G15/G16 (die Simulation bricht mit einer Meldung ab), Konturtaschenzyklus G34–G39, Außengewindefräsen G89, trochoidale Schruppbahnen sowie Werkzeuglängenkorrektur TL. Die Werte für EP, O1/O2 und G14 H sind wie oben festgelegt – bitte mit der Prüfungsunterlage abgleichen.</p></div></section>
 <section class="win hsec"><div class="wh">Bedienung</div><div class="hbody"><table>
         <tr><td>Maschine</td><td>blendet die offene Kreuztisch-Fräsmaschine ein/aus. Der Tisch fährt X und Y, der Spindelkopf Z – wie an der echten Maschine bewegt sich das Werkstück unter der Spindel. „Iso“ zeigt die ganze Maschine, „Oben“, „Vorne“, „Rechts“ das Werkstück.</td></tr>
+        <tr><td>Späne, Kühlmittel, Ton</td><td>im Menü „Ansicht“ ein- und ausschaltbar. Späne fliegen beim Zerspanen und bleiben auf Werkstück und Tisch liegen. Der Kühlmittelstrahl läuft bei M8/M13/M14 und drehender Spindel. Der Ton startet mit „Zyklus-Start“: Spindel, Zerspanen (Fräsen, Bohren, Gewindebohren klingen verschieden), Eilgang, Kühlmittel und Werkzeugwechsel.</td></tr>
         <tr><td>Linke Maustaste</td><td>Ansicht drehen</td></tr>
         <tr><td>Rechte Taste / Shift</td><td>verschieben</td></tr>
         <tr><td>Mausrad</td><td>zoomen (Touch: zwei Finger)</td></tr>
@@ -835,8 +854,10 @@ const PAL = (() => {
   const ADDR = new Set([
     'N', 'G', 'M', 'X', 'Y', 'Z', 'XA', 'YA', 'ZA', 'XI', 'YI', 'ZI', 'I', 'J', 'K', 'IA', 'JA', 'KA', 'R', 'F', 'S', 'T', 'TC', 'TR', 'TL',
     'D', 'DL', 'AS', 'AO', 'O', 'RN', 'RP', 'AP', 'AI', 'L', 'H', 'U', 'WV', 'RR', 'WA', 'WI', 'AR', 'V', 'W', 'LP', 'BP', 'E',
-    'AK', 'AL', 'EP', 'LZ', 'BZ', 'RZ', 'HA', 'HI', 'QM', 'RM', 'BA', 'Q', 'DI', 'OI', 'AN', 'RI', 'DA', 'DR', 'DM', 'VB'
+    'AK', 'AL', 'EP', 'LZ', 'BZ', 'RZ', 'HA', 'HI', 'QM', 'RM', 'BA', 'Q', 'DI', 'OI', 'AN', 'RI', 'DA', 'DR', 'DM', 'VB',
+    'CB', 'CM', 'AM', 'BM', 'BR', 'CR', 'DN', 'BG'
   ]);
+  const TOOLNAME = { drill: 'Spiralbohrer', center: 'NC-Anbohrer', tap: 'Gewindebohrer', chamfer: 'Fasenfräser' };
   const fmt = (v, d = 3) => (Math.round(v * 10 ** d) / 10 ** d).toString().replace('.', ',');
   const RAD = Math.PI / 180;
   const ABORT = { abort: true };
@@ -1071,23 +1092,24 @@ const PAL = (() => {
 
     const st = {
       pos: { ...cfg.tcp }, motion: null, plane: 17, abs: true, zp: 'G53',
-      sh: { x: 0, y: 0, z: 0 }, phi: 0, mx: 1, my: 1,
+      sh: { x: 0, y: 0, z: 0 }, phi: 0, mx: 1, my: 1, R: null,
       feedMode: 94, spMode: 97, F: 0, S: 0, spindle: 'M5', coolant: false, tool: -1, preT: null,
       TR: 0, TL: 0, comp: 40, N: null, pole: null, cycle: null, maxRpm: cfg.maxRpm
     };
     let t = 0, ended = false;
-    const executed = new Set(); let lastLine = null;
+    const executed = new Set(); let lastLine = null; const threads = [];
 
     /* ---- Koordinatensysteme ---- */
     const base = () => (st.zp === 'G53' ? (cfg.mo || { x: 0, y: 0, z: 0 }) : cfg.zero[st.zp]);
     const frame = () => {
       const b = base();
-      return { ox: b.x + st.sh.x, oy: b.y + st.sh.y, oz: b.z + st.sh.z, phi: st.phi, mx: st.mx, my: st.my, zp: st.zp, shifted: !!(st.sh.x || st.sh.y || st.sh.z || st.phi) };
+      return { ox: b.x + st.sh.x, oy: b.y + st.sh.y, oz: b.z + st.sh.z, phi: st.phi, mx: st.mx, my: st.my, zp: st.zp, R: st.R, moved: !!(st.sh.x || st.sh.y || st.sh.z || st.phi), shifted: !!(st.sh.x || st.sh.y || st.sh.z || st.phi || st.R) };
     };
     const toM = p => {
       const f = frame(), c = Math.cos(f.phi * RAD), s = Math.sin(f.phi * RAD);
       const x = p.x * f.mx, y = p.y * f.my;
-      return { x: f.ox + c * x - s * y, y: f.oy + s * x + c * y, z: f.oz + p.z };
+      const v = m3v(f.R, [c * x - s * y, s * x + c * y, p.z]);
+      return { x: f.ox + v[0], y: f.oy + v[1], z: f.oz + v[2] };
     };
     const fromM = p => toWks(frame(), p);
     const mirrored = () => st.mx * st.my < 0;
@@ -1327,7 +1349,7 @@ const PAL = (() => {
       const vf = feedRate();
       if (vf <= 0 && c.g !== 84) fail(ln, 'Kein Vorschub F für den Zyklus programmiert.');
       const V = W.V !== undefined ? W.V : 2;
-      if (W.V === undefined) msg('info', cl, 'V (Sicherheitsabstand) fehlt – es wird 2 mm verwendet.', 'noV' + cl);
+      if (W.V === undefined) msg('err', cl, `G${c.g}: Sicherheitsabstand V fehlt – Pflichtangabe nach PAL. Die Simulation rechnet mit 2 mm weiter.`, 'noV' + cl);
       calls.forEach((p, idx) => {
         const zS = p.z, zSafe = zS + V, zRet = W.W !== undefined ? W.W : zSafe;
         let zBot;
@@ -1400,28 +1422,130 @@ const PAL = (() => {
           go('G0', at(zSafe)); st.spindle = sp0; break;
         }
         case 72: case 73: case 74: case 75: pocket(g, W, cx); break;
+        case 87: case 88: helixCycle(g, W, cx); break;
         default: fail(cl, `Zyklus G${g} wird nicht unterstützt.`);
       }
     }
 
-    /* Taschen, Nuten, Kreistaschen */
+    /* G87 Bohrfräsen, G88 Innengewindefräsen (Schraubenlinie) */
+    function helixCycle(g, W, cx) {
+      const { p, zS, zSafe, zBot, vf, tl, cl, go } = cx;
+      if (!tl) fail(cx.ln, `G${g}: Zyklus ohne Werkzeug.`);
+      const rt = tl.D / 2;
+      if (W.BG !== undefined && W.BG !== 2 && W.BG !== 3) fail(cl, `BG${fmt(W.BG)} gibt es nicht (BG2 im Uhrzeigersinn, BG3 im Gegenuhrzeigersinn).`);
+      const helix = (r, a0, sweep, dir, z0, z1, f) => {
+        const n = Math.max(8, arcSteps(r, sweep)), sg = dir === 2 ? -1 : 1, pts = [{ ...st.pos }];
+        for (let k = 1; k <= n; k++) {
+          const u = k / n, a = a0 + sg * sweep * u;
+          pts.push(toM({ x: p.x + r * Math.cos(a), y: p.y + r * Math.sin(a), z: z0 + (z1 - z0) * u }));
+        }
+        addMove('G' + (mirrored() ? 5 - dir : dir), pts, f, cx.ln, { label: 'Schraubenlinie' });
+        st.pos = pts[pts.length - 1];
+      };
+      const at = (r, z) => ({ x: p.x + r, y: p.y, z });
+      if (g === 87) {
+        if (!(W.R > 0)) fail(cl, 'G87: Radius R der Bohrung fehlt.');
+        let Dz = W.D;
+        if (!(Dz > 0)) { Dz = Math.max(0.2, rt / 2); msg('err', cl, `G87: Zustellung D pro Schraubenlinie fehlt – Pflichtangabe nach PAL. Die Simulation rechnet mit D${fmt(Dz)}.`, 'g87d' + cl); }
+        const rh = W.R - rt;
+        if (rh < -1e-6) fail(cl, `G87: Das Werkzeug Ø${fmt(tl.D)} ist größer als die Bohrung Ø${fmt(2 * W.R)}.`);
+        const dir = W.BG === 2 ? 2 : 3;
+        if (rh < 1e-3) { msg('info', cl, 'G87: Bohrung und Fräser haben denselben Durchmesser – es wird senkrecht eingetaucht.', 'g87s' + cl); go('G1', at(0, zBot), vf); go('G0', at(0, zSafe)); return; }
+        go('G1', at(rh, zSafe), vf);
+        go('G1', at(rh, zS), vf);
+        const depth = zS - zBot;
+        if (depth > 1e-9) helix(rh, 0, 2 * Math.PI * depth / Dz, dir, zS, zBot, vf);
+        const a = fromM(st.pos), ang = Math.atan2(a.y - p.y, a.x - p.x);
+        helix(rh, ang, 2 * Math.PI, dir, zBot, zBot, vf);           // Vollkreis am Bohrungsgrund
+        go('G1', { x: p.x, y: p.y, z: zBot }, vf);
+        go('G0', { x: p.x, y: p.y, z: zSafe });
+        return;
+      }
+      // G88
+      if (!(W.DN > 0)) fail(cl, 'G88: Nenndurchmesser DN fehlt.');
+      if (!W.D) fail(cl, 'G88: Gewindesteigung D fehlt (D+ von oben nach unten, D− von unten nach oben).');
+      const P = Math.abs(W.D), upw = W.D < 0;
+      let Q = W.Q;
+      if (!(Q >= 1)) { msg('err', cl, 'G88: Gewinderillenzahl Q des Fräsers fehlt – Pflichtangabe nach PAL. Die Simulation rechnet mit Q1.', 'g88q' + cl); Q = 1; }
+      Q = Math.round(Q);
+      const rh = W.DN / 2 - rt;
+      if (rh <= 1e-3) fail(cl, `G88: Das Werkzeug Ø${fmt(tl.D)} ist für das Gewinde M${fmt(W.DN)} zu groß.`);
+      const dir = W.BG === 2 || W.BG === 3 ? W.BG : (upw ? 3 : 2);
+      const right = (dir === 2) !== upw;
+      if (W.BG === undefined) msg('info', cl, `G88 ohne BG: Rechtsgewinde, also BG${dir} bei D${upw ? '−' : '+'}.`, 'g88bg' + cl);
+      if (!['flat', 'thread'].includes(tl.type)) msg('warn', cl, `G88: T${tl.nr} ist kein Gewindefräser – die Bahn wird trotzdem simuliert.`, 'g88t' + cl);
+      const depth = zS - zBot, len = Q * P;
+      const passes = Math.max(1, Math.ceil(depth / len - 1e-9));
+      const t0 = t;
+      const z0s = [];
+      for (let k = 0; k < passes; k++) {
+        if (upw) z0s.push(Math.max(zBot, Math.min(zBot + k * len, zS - P)));
+        else z0s.push(Math.max(zBot, zS - (k + 1) * len) + P);
+      }
+      for (const zs of z0s) {
+        const ze = upw ? zs + P : zs - P;
+        go('G1', { x: p.x, y: p.y, z: zs }, vf);
+        go('G1', at(rh, zs), vf);
+        helix(rh, 0, 2 * Math.PI, dir, zs, ze, vf);
+        go('G1', { x: p.x, y: p.y, z: ze }, vf);
+      }
+      go('G0', { x: p.x, y: p.y, z: zSafe });
+      const top = toM({ x: p.x, y: p.y, z: zS }), bot = toM({ x: p.x, y: p.y, z: zBot });
+      threads.push({ x: top.x, y: top.y, r: W.DN / 2, p: right ? P : -P, za: top.z, zb: bot.z, up: upw, t0, t1: t, line: cl });
+      msg('info', cl, `G88: ${right ? 'Rechts' : 'Links'}gewinde M${fmt(W.DN)}×${fmt(P)}, ${passes} ${passes > 1 ? 'Umläufe' : 'Umlauf'} mit Q${Q}.`, 'g88i' + cl + '_' + cx.ln + '_' + p.x + p.y);
+    }
+
+    /* Taschen, Nuten, Kreistaschen – mit Zapfen, Stufen und Fasen */
     function pocket(g, W, cx) {
       const { p, zS, zSafe, zBot, vf, tl, cl, go } = cx;
       if (!tl) fail(cx.ln, 'Taschenzyklus ohne Werkzeug.');
       const rt = tl.D / 2, step = Math.max(0.2, 0.7 * tl.D);
+      if (['drill', 'center', 'tap'].includes(tl.type) || (tl.type === 'chamfer' && W.QM !== -1))
+        msg('warn', cx.ln, `T${tl.nr} ist ein ${TOOLNAME[tl.type]} – Taschen und Nuten fräst man mit einem Schaftfräser. Wegen der Werkzeugspitze bleibt der Boden uneben und wirkt weniger tief.`, 'pkt' + cx.ln + '_' + tl.nr);
       const AK = W.AK || 0, AL = W.AL || 0, E = W.E > 0 ? W.E : vf;
       const H = W.H === undefined ? 1 : W.H;
       if (![1, 4, 14].includes(H)) fail(cl, `H${H} ist hier nicht zulässig (H1 Schruppen, H4 Schlichten, H14 beides).`);
-      if (['LZ', 'BZ', 'HA', 'HI', 'BA', 'WA', 'QM'].some(k => W[k] !== undefined) || (g === 72 && W.RZ !== undefined)) msg('warn', cl, 'Zapfen, Stufen und Fasen (LZ, BZ, RZ, HA/HI, QM, BA, WA) werden in dieser Version noch nicht simuliert.', 'pkx' + cl);
       const D = W.D > 0 ? W.D : (zS - zBot);
-      if (!(W.D > 0)) msg('info', cl, 'Zustelltiefe D fehlt – die Tiefe wird in einem Schnitt gefräst.', 'noD' + cl);
+      if (!(W.D > 0)) msg('err', cl, `G${g}: Zustelltiefe D fehlt – Pflichtangabe nach PAL. Die Simulation fräst die Tiefe in einem Schnitt.`, 'noD' + cl);
+
+      // Bearbeitungsauswahl QM: 1 ohne Stufen (Standard), 2 mit Stufen, -1 Fasen
+      const QM = W.QM === undefined ? 1 : W.QM;
+      if (![1, 2, -1].includes(QM)) fail(cl, `QM${fmt(QM)} gibt es nicht (QM1 ohne Stufen, QM2 mit Stufen, QM-1 Fasen).`);
+      if (QM === 2 && !(W.BA > 0 && W.WA > 0)) fail(cl, `G${g} QM2: Stufenbreite BA und Stufentiefe WA angeben.`);
+      if (QM !== 2 && (W.BA !== undefined || W.WA !== undefined)) msg('warn', cl, 'Stufenbreite BA und Stufentiefe WA werden nur mit QM2 (Bearbeiten mit Stufen) gefräst.', 'qmba' + cl);
+      if (QM !== -1 && (W.CB !== undefined || W.CM !== undefined)) msg('warn', cl, 'Fasenbreite CB und CM wirken nur mit QM-1 (Fasen).', 'qmcb' + cl);
+      const BA = QM === 2 ? W.BA : 0, WA = QM === 2 ? W.WA : 0;
+      if (QM === 2 && zS - WA < zBot + 1e-9) fail(cl, 'Die Stufentiefe WA ist größer als die Taschentiefe.');
+
+      // Zapfen: G72 LZ/BZ (+RZ), G73 RZ; Höhe HA (absolut) oder HI (inkrementell ab Taschenboden)
+      let isl = false;
+      if (g === 72) {
+        if ((W.LZ > 0) !== (W.BZ > 0)) fail(cl, 'G72: Für den Zapfen Länge LZ und Breite BZ angeben.');
+        isl = W.LZ > 0;
+        if (!isl && W.RZ !== undefined) msg('warn', cl, 'RZ (Verrundung des Zapfens) wirkt nur mit LZ/BZ.', 'rzw' + cl);
+      } else if (g === 73) isl = W.RZ > 0;
+      else if (['LZ', 'BZ', 'RZ'].some(k => W[k] !== undefined)) msg('warn', cl, `G${g} hat keinen Zapfen – LZ, BZ und RZ werden übergangen.`, 'nozp' + cl);
+      if (W.HA !== undefined && W.HI !== undefined) fail(cl, 'HA und HI widersprechen sich – nur eine Angabe für die Zapfenhöhe.');
+      if (!isl && (W.HA !== undefined || W.HI !== undefined)) msg('warn', cl, 'HA/HI (Zapfenhöhe) wirken nur mit einem Zapfen.', 'hahi' + cl);
+      let zIsl = zS;
+      if (isl && W.HA !== undefined) zIsl = W.HA;
+      if (isl && W.HI !== undefined) zIsl = zBot + Math.abs(W.HI);
+      if (isl && zIsl > zS + 1e-9) fail(cl, 'Die Zapfenhöhe darf die Materialhöhe nicht überschreiten (HA/HI ≤ Materialoberfläche).');
+      if (isl && zIsl < zBot + 1e-9) fail(cl, 'Der Zapfen liegt unter dem Taschenboden – HA/HI prüfen.');
+
+      // RM: Mindestradius der Schruppbahnen in % des Fräserdurchmessers
+      if (W.RM !== undefined && !(W.RM >= 0)) fail(cl, 'RM muss ein positiver Prozentwert sein.');
+      const rmR = W.RM > 0 ? W.RM / 100 * tl.D : 0;
+      if (W.RM > 0) msg('info', cl, `RM${fmt(W.RM)}: Die Schruppbahnen werden mit mindestens R${fmt(rmR)} verrundet (keine trochoidalen Bahnen).`, 'rm' + cl);
+
       const ar = (cx.ar || 0) * RAD, ca = Math.cos(ar), sa = Math.sin(ar);
       let ox = 0, oy = 0;
-      if (g === 72 && W.EP === 1) { ox = W.LP / 2; oy = W.BP / 2; }
-      if (g === 74 && W.EP === 1) { ox = W.LP / 2 - W.BP / 2; }
+      // Setzpunkt EP nach PAL: G72 EP0 Mitte (Standard), EP1 rechts oben, EP2 links oben, EP3 links unten, EP4 rechts unten
+      if (g === 72 && W.EP) { const sx = { 1: -1, 2: 1, 3: 1, 4: -1 }[W.EP], sy = { 1: -1, 2: -1, 3: 1, 4: 1 }[W.EP]; if (sx === undefined) fail(cl, `G72: Setzpunkt EP${W.EP} gibt es nicht (EP0–EP4).`); ox = sx * W.LP / 2; oy = sy * W.BP / 2; }
+      // G74 EP0 Mitte, EP1 rechter Bogenmittelpunkt, EP3 linker Bogenmittelpunkt (Standard)
+      if (g === 74) { const ep = W.EP === undefined ? 3 : W.EP; const e = W.LP / 2 - W.BP / 2; if (ep === 1) ox = -e; else if (ep === 3) ox = e; else if (ep !== 0) fail(cl, `G74: Setzpunkt EP${ep} gibt es nicht (EP0, EP1, EP3).`); }
       const Lw = (lx, ly, z) => { const x = lx + ox, y = ly + oy; return { x: p.x + ca * x - sa * y, y: p.y + sa * x + ca * y, z }; };
       const arcW = (cxL, cyL, endL, dir, z0, z1, f) => {
-        // Bogen lokal diskretisieren und als eine Bewegung ausgeben
         const s = fromM(st.pos);
         const sl = (() => { const x = s.x - p.x, y = s.y - p.y; return { x: ca * x + sa * y - ox, y: -sa * x + ca * y - oy }; })();
         const a0 = Math.atan2(sl.y - cyL, sl.x - cxL), a1 = Math.atan2(endL.y - cyL, endL.x - cxL);
@@ -1436,35 +1560,60 @@ const PAL = (() => {
         st.pos = pts[pts.length - 1];
       };
       const lineL = (x, y, z, f) => go('G1', Lw(x, y, z), f);
+      const enter = (x, y, z, plunge) => {
+        if (plunge) {
+          const s = fromM(st.pos), q = Lw(x, y, 0);
+          if (Math.hypot(s.x - q.x, s.y - q.y) > 1e-6) go('G0', Lw(x, y, s.z));
+          lineL(x, y, z, E);
+        } else lineL(x, y, z, vf);
+      };
 
-      // Bahnen einer Ebene erzeugen
-      function rectRings(ax, ay, rc) {
+      /* einzelne Umläufe (Werkzeugmittelpunktsbahn, lokal, gegen den Uhrzeigersinn, Start bei (a, 0)) */
+      function ringRect(a, b, c, z) {
+        c = Math.min(Math.max(c, 0), a, b);
+        lineL(a, 0, z, vf);
+        lineL(a, b - c, z, vf);
+        if (c > 1e-6) arcW(a - c, b - c, { x: a - c, y: b }, 3, z, z, vf);
+        lineL(-a + c, b, z, vf);
+        if (c > 1e-6) arcW(-a + c, b - c, { x: -a, y: b - c }, 3, z, z, vf);
+        lineL(-a, -b + c, z, vf);
+        if (c > 1e-6) arcW(-a + c, -b + c, { x: -a + c, y: -b }, 3, z, z, vf);
+        lineL(a - c, -b, z, vf);
+        if (c > 1e-6) arcW(a - c, -b + c, { x: a, y: -b + c }, 3, z, z, vf);
+        lineL(a, 0, z, vf);
+      }
+      const P = (r, a) => ({ x: r * Math.cos(a), y: r * Math.sin(a) });
+      function ringArcSlot(Rm, a0, a1, w, z) {
+        const oe = P(Rm + w, a1), ie = P(Rm - w, a1), os = P(Rm + w, a0), is = P(Rm - w, a0), ce = P(Rm, a1), cs = P(Rm, a0);
+        lineL(oe.x, oe.y, z, vf);
+        if (w > 1e-6) arcW(ce.x, ce.y, ie, 3, z, z, vf);
+        if (Rm - w > 1e-6) arcW(0, 0, is, 2, z, z, vf); else lineL(is.x, is.y, z, vf);
+        if (w > 1e-6) arcW(cs.x, cs.y, os, 3, z, z, vf);
+        arcW(0, 0, oe, 3, z, z, vf);
+      }
+
+      /* ausräumen einer Ebene */
+      function cutRect(ax, ay, rc, z, plunge, rough) {
         const rings = [];
         for (let o = 0; Math.min(ax - o, ay - o) > 1e-6; o += step) {
           const a = ax - o, b = ay - o;
-          rings.push({ a, b, rc: Math.min(Math.max(rc - o, 0), a, b) });
+          rings.push({ a, b, rc: Math.min(Math.max(rc - o, rough ? rmR : 0), a, b) });
         }
-        return [{ line: true, a: Math.max(ax - ay, 0), b: Math.max(ay - ax, 0) }, ...rings.reverse()];
+        if (!rings.length) rings.push({ a: Math.max(ax, 0), b: Math.max(ay, 0), rc: 0 });
+        rings.reverse();
+        const la = Math.max(ax - ay, 0), lb = Math.max(ay - ax, 0);
+        enter(-la, -lb, z, plunge);
+        if (la > 1e-6 || lb > 1e-6) lineL(la, lb, z, vf);
+        for (const R of rings) ringRect(R.a, R.b, R.rc, z);
       }
-      function cutRect(ax, ay, rc, z, plunge) {
-        const rings = rectRings(ax, ay, rc);
-        const r0 = rings[0];
-        const start = r0.line ? { x: -r0.a, y: -r0.b } : { x: r0.a, y: 0 };
-        if (plunge) { const s = fromM(st.pos); if (Math.hypot(s.x - Lw(start.x, start.y, 0).x, s.y - Lw(start.x, start.y, 0).y) > 1e-6) go('G0', Lw(start.x, start.y, s.z)); lineL(start.x, start.y, z, E); }
-        else lineL(start.x, start.y, z, vf);
-        for (const R of rings) {
-          if (R.line) { if (R.a > 1e-6 || R.b > 1e-6) lineL(R.a, R.b, z, vf); continue; }
-          const { a, b, rc: c } = R;
-          lineL(a, 0, z, vf);
-          lineL(a, b - c, z, vf);
-          if (c > 1e-6) arcW(a - c, b - c, { x: a - c, y: b }, 3, z, z, vf);
-          lineL(-a + c, b, z, vf);
-          if (c > 1e-6) arcW(-a + c, b - c, { x: -a, y: b - c }, 3, z, z, vf);
-          lineL(-a, -b + c, z, vf);
-          if (c > 1e-6) arcW(-a + c, -b + c, { x: -a + c, y: -b }, 3, z, z, vf);
-          lineL(a - c, -b, z, vf);
-          if (c > 1e-6) arcW(a - c, -b + c, { x: a, y: -b + c }, 3, z, z, vf);
-          lineL(a, 0, z, vf);
+      function cutRectIsland(ax, ay, rc, ix, iy, ic, z, plunge, rough) {
+        const n = Math.max(1, Math.ceil(Math.max(ax - ix, ay - iy) / step - 1e-9));
+        enter(ix, 0, z, plunge);
+        for (let k = 0; k <= n; k++) {
+          const f = k / n, a = ix + (ax - ix) * f, b = iy + (ay - iy) * f;
+          let c = ic + (rc - ic) * f;
+          if (rough && k < n) c = Math.max(c, rmR);
+          ringRect(a, b, c, z);
         }
       }
       function cutCircle(rf, ri, z, plunge) {
@@ -1472,77 +1621,126 @@ const PAL = (() => {
         if (ri > 0) { for (let r = ri; r < rf - 1e-6; r += step) radii.push(r); radii.push(rf); }
         else { for (let r = rf; r > 1e-6; r -= step) radii.unshift(r); }
         const r0 = ri > 0 ? ri : 0;
-        if (plunge) { const s = fromM(st.pos); go('G0', Lw(r0, 0, s.z)); lineL(r0, 0, z, E); } else lineL(r0, 0, z, vf);
+        enter(r0, 0, z, plunge);
         radii.forEach((r, k) => {
           lineL(r, 0, z, vf);
           arcW(0, 0, { x: r, y: 0 }, ri > 0 && k === 0 ? 2 : 3, z, z, vf);
         });
       }
       function cutArcSlot(Rm, a0, a1, wf, z, plunge) {
-        const P = (r, a) => ({ x: r * Math.cos(a), y: r * Math.sin(a) });
         const s0 = P(Rm, a0);
-        if (plunge) { const s = fromM(st.pos); go('G0', Lw(s0.x, s0.y, s.z)); lineL(s0.x, s0.y, z, E); } else lineL(s0.x, s0.y, z, vf);
-        const e0 = P(Rm, a1);
-        arcW(0, 0, e0, 3, z, z, vf);
+        enter(s0.x, s0.y, z, plunge);
+        arcW(0, 0, P(Rm, a1), 3, z, z, vf);
         const ws = [];
         for (let w = step / 2; w < wf - 1e-6; w += step / 2) ws.push(w);
         if (wf > 1e-6) ws.push(wf);
-        for (const w of ws) {
-          const oe = P(Rm + w, a1), ie = P(Rm - w, a1), os = P(Rm + w, a0), is = P(Rm - w, a0);
-          const ce = P(Rm, a1), cs = P(Rm, a0);
-          lineL(oe.x, oe.y, z, vf);
-          arcW(ce.x, ce.y, ie, 3, z, z, vf);
-          arcW(0, 0, is, 2, z, z, vf);
-          arcW(cs.x, cs.y, os, 3, z, z, vf);
-          arcW(0, 0, oe, 3, z, z, vf);
-        }
+        for (const w of ws) ringArcSlot(Rm, a0, a1, w, z);
       }
-      // Geometrie bestimmen
-      let shape;
+
+      // Geometrie bestimmen: shape(ak, grow, withIsland, rough) liefert eine Funktion (z, plunge)
+      const tooBig = what => fail(cl, `G${g}: Das Werkzeug Ø${fmt(tl.D)} ist zu groß für ${what}.`);
+      let shape, a0s = 0, a1s = 0;
       if (g === 72 || g === 74) {
         if (!(W.LP > 0) || !(W.BP > 0)) fail(cl, `G${g}: Länge LP und Breite BP angeben.`);
         const rcIn = g === 74 ? W.BP / 2 : (W.RN || 0);
-        if (g === 72 && rcIn < rt - 1e-6) msg('info', cl, `Eckenradius RN${fmt(rcIn)} ist kleiner als der Fräserradius – die Ecken werden mit R${fmt(rt)} gefräst.`, 'rn' + cl);
-        shape = (ak) => {
-          const ax = W.LP / 2 - ak - rt, ay = W.BP / 2 - ak - rt;
-          if (ax < -1e-6 || ay < -1e-6) fail(cl, `G${g}: Das Werkzeug Ø${fmt(tl.D)} ist zu groß für die ${g === 74 ? 'Nut' : 'Tasche'}.`);
-          return (z, pl) => cutRect(Math.max(ax, 0), Math.max(ay, 0), Math.max(rcIn - ak - rt, 0), z, pl);
+        if (g === 72 && rcIn < rt - 1e-6 && QM !== -1) msg('info', cl, `Eckenradius RN${fmt(rcIn)} ist kleiner als der Fräserradius – die Ecken werden mit R${fmt(rt)} gefräst.`, 'rn' + cl);
+        if (isl) {
+          if (W.LZ >= W.LP || W.BZ >= W.BP) fail(cl, 'G72: Der Zapfen LZ×BZ ist nicht kleiner als die Tasche LP×BP.');
+          if ((W.RZ || 0) > Math.min(W.LZ, W.BZ) / 2 + 1e-9) fail(cl, 'G72: Der Verrundungsradius RZ ist größer als der halbe Zapfen.');
+        }
+        shape = (ak, grow, withIsl, rough) => {
+          const ax = W.LP / 2 + grow - ak - rt, ay = W.BP / 2 + grow - ak - rt;
+          if (ax < -1e-6 || ay < -1e-6) tooBig(g === 74 ? 'die Nut' : 'die Tasche');
+          const c = Math.max(rcIn + grow - ak - rt, 0);
+          if (!withIsl) return (z, pl) => cutRect(Math.max(ax, 0), Math.max(ay, 0), c, z, pl, rough);
+          const ix = W.LZ / 2 + ak + rt, iy = W.BZ / 2 + ak + rt, ic = (W.RZ || 0) + ak + rt;
+          if (ix > ax + 1e-6 || iy > ay + 1e-6) fail(cl, 'G72: Zwischen Zapfen und Taschenrand ist kein Platz für das Werkzeug.');
+          return (z, pl) => cutRectIsland(ax, ay, c, Math.min(ix, ax), Math.min(iy, ay), ic, z, pl, rough);
         };
       } else if (g === 73) {
         if (!(W.R > 0)) fail(cl, 'G73: Radius R der Kreistasche angeben.');
-        shape = (ak) => {
-          const rf = W.R - ak - rt, ri = W.RZ > 0 ? W.RZ + ak + rt : 0;
-          if (rf < -1e-6) fail(cl, `G73: Das Werkzeug Ø${fmt(tl.D)} ist zu groß für die Kreistasche.`);
-          if (ri > 0 && ri > rf) fail(cl, 'G73: Zwischen Zapfen RZ und Taschenrand ist kein Platz für das Werkzeug.');
-          return (z, pl) => cutCircle(Math.max(rf, 0), ri, z, pl);
+        if (isl && W.RZ >= W.R) fail(cl, 'G73: Der Zapfen RZ ist nicht kleiner als die Kreistasche R.');
+        shape = (ak, grow, withIsl) => {
+          const rf = W.R + grow - ak - rt, ri = withIsl ? W.RZ + ak + rt : 0;
+          if (rf < -1e-6) tooBig('die Kreistasche');
+          if (ri > 0 && ri > rf + 1e-6) fail(cl, 'G73: Zwischen Zapfen RZ und Taschenrand ist kein Platz für das Werkzeug.');
+          return (z, pl) => cutCircle(Math.max(rf, 0), Math.min(ri, Math.max(rf, 0)), z, pl);
         };
       } else {
         if (!(W.BP > 0) || !(W.RP > 0)) fail(cl, 'G75: Breite BP und Radius RP angeben.');
-        const a0 = (W.AN || 0) * RAD;
-        let a1;
-        if (W.AO !== undefined) a1 = a0 + W.AO * RAD; else if (W.AP !== undefined) a1 = W.AP * RAD; else fail(cl, 'G75: Öffnungswinkel AO oder Endwinkel AP angeben.');
-        while (a1 <= a0) a1 += 2 * Math.PI;
-        shape = (ak) => {
-          const wf = W.BP / 2 - ak - rt;
-          if (wf < -1e-6) fail(cl, `G75: Das Werkzeug Ø${fmt(tl.D)} ist breiter als die Nut.`);
-          return (z, pl) => cutArcSlot(W.RP, a0, a1, Math.max(wf, 0), z, pl);
+        a0s = (W.AN || 0) * RAD;
+        if (W.AO !== undefined) a1s = a0s + W.AO * RAD; else if (W.AP !== undefined) a1s = W.AP * RAD; else fail(cl, 'G75: Öffnungswinkel AO oder Endwinkel AP angeben.');
+        while (a1s <= a0s) a1s += 2 * Math.PI;
+        shape = (ak, grow) => {
+          const wf = W.BP / 2 + grow - ak - rt;
+          if (wf < -1e-6) tooBig('die Nut');
+          return (z, pl) => cutArcSlot(W.RP, a0s, a1s, Math.max(wf, 0), z, pl);
         };
       }
-      const levels = target => { const L = []; let z = zS; while (z > target + 1e-9) { z = Math.max(target, z - D); L.push(z); } return L.length ? L : [target]; };
-      const doPass = (ak, al) => {
-        const cut = shape(ak), Ls = levels(zBot + al);
-        Ls.forEach((z, k) => {
-          cut(z, true);
-          if (k < Ls.length - 1) { const s = fromM(st.pos); go('G0', { ...s, z: zSafe }); }
-        });
-        const s = fromM(st.pos); go('G0', { ...s, z: zSafe });
+      const up = () => { const s = fromM(st.pos); if (s.z < zSafe - 1e-9) go('G0', { ...s, z: zSafe }); };
+
+      /* QM-1: Fasen an den Oberkanten mit einem Fas- bzw. Zentrierwerkzeug */
+      if (QM === -1) {
+        if (!['chamfer', 'center', 'drill'].includes(tl.type)) fail(cl, `QM-1 (Fasen) braucht ein Fas- oder Zentrierwerkzeug – T${tl.nr} ist ein ${tl.name || 'Fräser'} ohne Spitzenwinkel.`);
+        if (!(W.CB > 0)) fail(cl, 'QM-1: Fasenbreite CB angeben.');
+        const CB = W.CB, k = 1 / Math.tan(Math.max(10, Math.min(179, tl.angle || 90)) / 2 * RAD);
+        const r0 = tl.type === 'chamfer' ? Math.min(Math.max(tl.tipD || 0, 0) / 2, rt) : 0;
+        const CM = W.CM === undefined ? 50 : W.CM;
+        if (!(CM >= 0 && CM <= 100)) fail(cl, 'CM muss zwischen 0 und 100 % liegen.');
+        const rc = r0 + CM / 100 * (rt - r0);
+        if (rc - CB / 2 < r0 - 1e-6 || rc + CB / 2 > rt + 1e-6) msg('warn', cl, `Die Fase CB${fmt(CB)} passt bei CM${fmt(CM)} nicht vollständig auf die Schneide von T${tl.nr}.`, 'cbw' + cl);
+        const tip = zTop => zTop - CB * k / 2 - (rc - r0) * k;
+        const dIn = rc - CB / 2;          // Abstand Bahn ↔ Kante (positiv: Bahn liegt in der Tasche)
+        const zTopP = zS;
+        const run = (fn, sx, sy, zt) => { up(); enter(sx, sy, zt, true); fn(zt); up(); };
+        if (g === 72 || g === 74) {
+          const rcIn = g === 74 ? W.BP / 2 : (W.RN || 0);
+          const a = W.LP / 2 - dIn, b = W.BP / 2 - dIn;
+          if (a < 0 || b < 0) tooBig('die Fase');
+          run(z => ringRect(a, b, Math.max(rcIn - dIn, 0), z), a, 0, tip(zTopP));
+          if (isl) { const ia = W.LZ / 2 + dIn, ib = W.BZ / 2 + dIn; run(z => ringRect(ia, ib, Math.max((W.RZ || 0) + dIn, 0), z), ia, 0, tip(zIsl)); }
+        } else if (g === 73) {
+          const r = W.R - dIn;
+          if (r < 0) tooBig('die Fase');
+          run(z => arcW(0, 0, { x: r, y: 0 }, 3, z, z, vf), r, 0, tip(zTopP));
+          if (isl) { const ri = W.RZ + dIn; run(z => arcW(0, 0, { x: ri, y: 0 }, 3, z, z, vf), ri, 0, tip(zIsl)); }
+        } else {
+          const w = W.BP / 2 - dIn;
+          if (w < 0) tooBig('die Fase');
+          const s0 = P(W.RP + w, a1s);
+          run(z => ringArcSlot(W.RP, a0s, a1s, w, z), s0.x, s0.y, tip(zTopP));
+        }
+        msg('info', cl, `QM-1: Fase ${fmt(CB)} mm an den Oberkanten (Arbeitspunkt CM${fmt(CM)} % der Schneide).`, 'cbi' + cl);
+        return;
+      }
+
+      /* Ebenen: Stufe (QM2), Zapfenoberkante (HA/HI), Taschenboden */
+      const levelsTo = zFloor => {
+        const bps = [];
+        if (QM === 2 && zS - WA > zFloor + 1e-9) bps.push(zS - WA);
+        if (isl && zIsl < zS - 1e-9 && zIsl > zFloor + 1e-9) bps.push(zIsl);
+        bps.push(zFloor);
+        bps.sort((a, b) => b - a);
+        const L = []; let z = zS;
+        for (const bp of bps) while (z > bp + 1e-9) { z = Math.max(bp, z - D); L.push(z); }
+        return L.length ? L : [zFloor];
       };
-      if (H === 1 || H === 14) doPass(AK, AL);
+      const cache = {};
+      const shapeAt = (ak, z, rough) => {
+        const grow = QM === 2 && z >= zS - WA - 1e-9 ? BA : 0, wi = isl && z < zIsl - 1e-9;
+        const key = [ak, grow, wi, rough].join('|');
+        return cache[key] || (cache[key] = shape(ak, grow, wi, rough));
+      };
+      if (H === 1 || H === 14) {
+        levelsTo(zBot + AL).forEach(z => { shapeAt(AK, z, true)(z, true); up(); });
+      }
       if (H === 4 || H === 14) {
         if (H === 4 && !(AK || AL)) msg('info', cl, 'H4 ohne Aufmaß AK/AL – es wird die Endkontur gefräst.', 'h4' + cl);
-        const cut = shape(0);
-        cut(zBot, true);
-        const s = fromM(st.pos); go('G0', { ...s, z: zSafe });
+        const fin = [];
+        if (QM === 2) fin.push(zS - WA);
+        if (isl && zIsl < zS - 1e-9) fin.push(zIsl);
+        fin.push(zBot);
+        [...new Set(fin)].sort((a, b) => b - a).forEach(z => { shapeAt(0, z, false)(z, true); up(); });
       }
     }
 
@@ -1595,18 +1793,28 @@ const PAL = (() => {
           case 72: case 73: case 74: case 75: case 81: case 82: case 83: case 84: case 85: case 86:
           case 76: case 77: case 78: case 79:
             special.push(g); break;
-          case 15: case 16: fail(ln, `G${g} (Schwenken/Mehrseitenbearbeitung) wird im 3-Achs-Simulator nicht unterstützt.`); break;
+          case 15: case 16: fail(ln, `G${g} (Schwenken der Bearbeitungsebene) ist in dieser Simulationssoftware nicht möglich – die simulierte Maschine hat keinen Schwenkkopf.`); break;
           case 34: case 35: case 36: case 37: case 38: case 39: fail(ln, `G${g} (Konturtaschenzyklus) wird in dieser Version noch nicht unterstützt.`); break;
-          case 88: case 89: fail(ln, `G${g} (Gewindefräszyklus) wird in dieser Version noch nicht unterstützt.`); break;
+          case 87: case 88: special.push(g); break;
+          case 89: fail(ln, 'G89 (Außengewindefräszyklus) wird in dieser Version noch nicht unterstützt.'); break;
           case 51: msg('info', ln, 'G51 (Nullpunkte setzen) wird übergangen – Nullpunkte bitte in der Nullpunkttabelle eintragen.'); break;
           case 61: case 62: case 63: fail(ln, `G${g} wird in dieser Version nicht unterstützt.`); break;
           default: fail(ln, `G${g} wird in dieser Version nicht unterstützt.`);
         }
       }
       const has = g => special.includes(g);
-      const cycDef = [72, 73, 74, 75, 81, 82, 83, 84, 85, 86].find(has);
+      const cycDef = [72, 73, 74, 75, 81, 82, 83, 84, 85, 86, 87, 88].find(has);
       const cycCall = [76, 77, 78, 79].find(has);
       const apdep = [45, 46, 47].find(has);
+      // häufige Verwechslungen bei An- und Abfahrbewegungen: wird wie DL bzw. RR gerechnet, aber angemerkt
+      if (apdep === 45 && W.DL === undefined && W.D !== undefined) {
+        W.DL = W.D; delete W.D;
+        msg('warn', ln, `G45: Die Länge der An- bzw. Abfahrgeraden heißt nach PAL DL, nicht D. Die Simulation rechnet mit DL${fmt(W.DL)}.`, 'g45d' + ln);
+      }
+      if ((apdep === 46 || apdep === 47) && W.RR === undefined && W.R !== undefined) {
+        W.RR = W.R; delete W.R;
+        msg('warn', ln, `G${apdep}: Der Radius der An- bzw. Abfahrbewegung heißt nach PAL RR, nicht R. Die Simulation rechnet mit RR${fmt(W.RR)}.`, 'g46r' + ln);
+      }
 
       // Nullpunkte / Koordinatentransformation (nicht während der Radiuskorrektur)
       const frameChange = zp !== null || has(50) || has(58) || has(59) || has(66);
@@ -1620,7 +1828,8 @@ const PAL = (() => {
         const inc = { x: W.XI || 0, y: W.YI || 0 };
         if (W.X !== undefined || W.Y !== undefined) { inc.x += W.X || 0; inc.y += W.Y || 0; msg('info', ln, 'Hinweis PAL 2020: Nullpunktverschiebung mit XI/YI/ZI (inkrementell) oder XA/YA/ZA (absolut) programmieren.', 'g59old'); }
         const v = rotV({ x: inc.x * st.mx, y: inc.y * st.my }, st.phi);
-        st.sh.x += v.x; st.sh.y += v.y; st.sh.z += (W.ZI || 0) + (W.Z || 0);
+        const v3 = m3v(st.R, [v.x, v.y, (W.ZI || 0) + (W.Z || 0)]);
+        st.sh.x += v3[0]; st.sh.y += v3[1]; st.sh.z += v3[2];
         if (W.XA !== undefined) st.sh.x = W.XA;
         if (W.YA !== undefined) st.sh.y = W.YA;
         if (W.ZA !== undefined) st.sh.z = W.ZA;
@@ -1653,6 +1862,7 @@ const PAL = (() => {
         const nc = has(41) ? 41 : 42;
         if (st.comp !== 40 && st.comp !== nc) fail(ln, 'Wechsel zwischen G41 und G42 ist nur über G40 möglich.');
         if (st.plane !== 17) fail(ln, 'Die Fräserradiuskorrektur wird nur in der Ebene G17 unterstützt.');
+        { const tl = toolObj(); if (tl && ['drill', 'center', 'tap'].includes(tl.type) && st.comp === 40) msg('warn', ln, `T${tl.nr} ist ein ${TOOLNAME[tl.type]} – Konturen fräst man mit einem Fräser, nicht mit einem Bohrwerkzeug.`, 'cmpt' + ln); }
         st.comp = nc;
       }
       const compSide = st.comp === 40 ? 40 : (mirrored() ? 83 - st.comp : st.comp);
@@ -1719,6 +1929,7 @@ const PAL = (() => {
         forceFlush(ln, 'Eine Zyklusdefinition');
         st.cycle = { g: cycDef, W: { ...W, M: ms.find(m => m === 3 || m === 4) }, line: ln };
         if (cycDef === 84 && W.F !== undefined && !(W.F > 0)) fail(ln, 'G84: Gewindesteigung F muss positiv sein.');
+        if (cycDef === 84 && !ms.some(m => m === 3 || m === 4)) msg('err', ln, 'G84: Drehrichtung M3 (Rechtsgewinde) bzw. M4 (Linksgewinde) fehlt im Zyklussatz – Pflichtangabe nach PAL.', 'g84m' + ln);
       }
       if (has(80)) st.cycle = null;
 
@@ -1735,8 +1946,13 @@ const PAL = (() => {
         if (motion !== null) fail(ln, 'Zyklusaufruf und Wegbedingung dürfen nicht im selben Satz stehen.');
         const cur = off();
         const resolve = (U, curV) => (W[U + 'A'] !== undefined ? W[U + 'A'] : W[U + 'I'] !== undefined ? curV + W[U + 'I'] : W[U] !== undefined ? (st.abs ? W[U] : curV + W[U]) : undefined);
-        const zS = resolve('Z', cur.z);
-        if (zS === undefined) fail(ln, `G${cycCall}: Materialoberfläche Z fehlt.`);
+        let zS0 = resolve('Z', cur.z);
+        if (zS0 === undefined) {
+          zS0 = cur.z;
+          if (cycCall === 77) msg('err', ln, 'G77: Z (Materialoberfläche) fehlt – Pflichtangabe nach PAL. Die Simulation nimmt die aktuelle Z-Position.', 'g77z' + ln);
+          else msg('info', ln, `G${cycCall}: Ohne Z gilt die aktuelle Z-Position (Z${fmt(cur.z)}) als Materialoberfläche.`, 'cz' + ln);
+        }
+        const zS = zS0;
         const calls = [];
         const ar = W.AR || 0;
         if (cycCall === 79) {
@@ -1745,10 +1961,20 @@ const PAL = (() => {
         } else if (cycCall === 78) {
           const pc = { x: W.IA !== undefined ? W.IA : cur.x + (W.I || 0), y: W.JA !== undefined ? W.JA : cur.y + (W.J || 0) };
           if (W.RP === undefined || W.AP === undefined) fail(ln, 'G78: Polarradius RP und Polarwinkel AP angeben.');
+          if ((W.IA === undefined && W.I === undefined) || (W.JA === undefined && W.J === undefined)) msg('err', ln, 'G78: Pol I/IA und J/JA fehlt – Pflichtangabe nach PAL. Die Simulation nimmt die aktuelle Position als Pol.', 'g78p' + ln);
           calls.push({ x: pc.x + W.RP * Math.cos(W.AP * RAD), y: pc.y + W.RP * Math.sin(W.AP * RAD), z: zS, ar });
         } else if (cycCall === 77) {
           const pc = { x: W.IA !== undefined ? W.IA : cur.x + (W.I || 0), y: W.JA !== undefined ? W.JA : cur.y + (W.J || 0) };
           if (!(W.R > 0)) fail(ln, 'G77: Lochkreisradius R fehlt.');
+          {
+            const miss = [];
+            if (W.IA === undefined && W.I === undefined) miss.push('I/IA');
+            if (W.JA === undefined && W.J === undefined) miss.push('J/JA');
+            if (W.AN === undefined) miss.push('AN');
+            if (W.AI === undefined && W.AP === undefined) miss.push('AI oder AP');
+            if (W.O === undefined) miss.push('O');
+            if (miss.length) msg('err', ln, `G77: ${miss.join(', ')} fehlt – Pflichtangabe nach PAL. Die Simulation nimmt Standardwerte (aktuelle Position, 0°, gleichmäßige Teilung).`, 'g77m' + ln);
+          }
           const AN = W.AN || 0;
           let angs = [];
           const O = W.O;
@@ -1767,6 +1993,8 @@ const PAL = (() => {
           const x0 = resolve('X', cur.x), y0 = resolve('Y', cur.y);
           const P0 = { x: x0 !== undefined ? x0 : cur.x, y: y0 !== undefined ? y0 : cur.y };
           if (!(W.O > 0)) fail(ln, 'G76: Anzahl O der Zyklusaufrufe fehlt.');
+          if (W.AS === undefined) msg('err', ln, 'G76: Winkel AS der Geraden fehlt – Pflichtangabe nach PAL. Die Simulation nimmt 0°.', 'g76as' + ln);
+          if (W.D === undefined) msg('err', ln, 'G76: Abstand D fehlt – Pflichtangabe nach PAL.', 'g76d' + ln);
           const AS = (W.AS || 0) * RAD, Dd = W.D || 0, Q = W.Q || 0;
           const AI2 = AS + (W.AI !== undefined ? W.AI : 90) * RAD, DI = W.DI || 0, OI = Q ? (W.OI > 0 ? W.OI : 1) : 1;
           if ((W.O > 1 && !Dd) || (Q && OI > 1 && !DI)) fail(ln, 'G76: Abstand D bzw. DI fehlt.');
@@ -1944,15 +2172,26 @@ const PAL = (() => {
       try { buf = buf.filter(x => x.comp === 40); st.comp = 40; flush(); } catch (e2) { /* Rest verwerfen */ }
       msg('info', null, 'Die Simulation läuft bis zum fehlerhaften Satz.');
     }
-    return { moves, msgs, stops: stops.sort((a, b) => a.t - b.t), total: t, aborted, blocks: executed.size, lastLine };
+    return { moves, msgs, stops: stops.sort((a, b) => a.t - b.t), total: t, aborted, blocks: executed.size, lastLine, threads };
   }
 
   function toWks(f, p) {
     if (!f) return { ...p };
     const c = Math.cos(f.phi * RAD), s = Math.sin(f.phi * RAD);
-    const dx = p.x - f.ox, dy = p.y - f.oy;
-    return { x: (c * dx + s * dy) * f.mx, y: (-s * dx + c * dy) * f.my, z: p.z - f.oz };
+    const [dx, dy, dz] = m3tv(f.R, [p.x - f.ox, p.y - f.oy, p.z - f.oz]);
+    return { x: (c * dx + s * dy) * f.mx, y: (-s * dx + c * dy) * f.my, z: dz };
   }
+  /* 3×3-Drehmatrizen (zeilenweise); ohne Schwenken bleibt R = null */
+  function m3v(R, v) { return R ? [R[0] * v[0] + R[1] * v[1] + R[2] * v[2], R[3] * v[0] + R[4] * v[1] + R[5] * v[2], R[6] * v[0] + R[7] * v[1] + R[8] * v[2]] : v; }
+  function m3tv(R, v) { return R ? [R[0] * v[0] + R[3] * v[1] + R[6] * v[2], R[1] * v[0] + R[4] * v[1] + R[7] * v[2], R[2] * v[0] + R[5] * v[1] + R[8] * v[2]] : v; }
+  function m3m(A, B) { const o = []; for (let r = 0; r < 3; r++) for (let c = 0; c < 3; c++) o.push(A[r * 3] * B[c] + A[r * 3 + 1] * B[3 + c] + A[r * 3 + 2] * B[6 + c]); return o; }
+  function rotAx(ax, deg) {
+    const c = Math.cos(deg * RAD), s = Math.sin(deg * RAD);
+    if (ax === 'x') return [1, 0, 0, 0, c, -s, 0, s, c];
+    if (ax === 'y') return [c, 0, s, 0, 1, 0, -s, 0, c];
+    return [c, -s, 0, s, c, 0, 0, 0, 1];
+  }
+  const isId = R => !R || R.every((v, i) => Math.abs(v - (i % 4 === 0 ? 1 : 0)) < 1e-12);
 
   /* ---------- Werkzeugprofil (r, z ab Spitze) ---------- */
   function cutProfile(tl) {
@@ -2127,7 +2366,7 @@ if (typeof module !== 'undefined') module.exports = PAL;
 
 /* ===== Voreinstellungen und Beispielprogramme ===== */
 const DEFAULTS = {
-  /* Maschinenkoordinaten (MKS): M liegt links vorne auf der Tischoberfläche, Rohteil auf 12 mm Parallelunterlagen */
+  /* Maschinenkoordinaten (MKS): M liegt links vorne auf der Tischoberfläche, Rohteil auf 12 mm Parallelunterlagen, wahlweise im 40 mm hohen Schraubstock */
   stock: { L: 100, B: 80, H: 20, x0: 160, y0: 75 },
   zero: {
     G54: { x: 160, y: 75, z: 32 },
@@ -2135,7 +2374,7 @@ const DEFAULTS = {
     G56: { x: 0, y: 0, z: 0 },
     G57: { x: 0, y: 0, z: 0 }
   },
-  machine: { rapid: 8000, tcp: { x: 150, y: 75, z: 150 }, maxRpm: 24000, res: 560 },
+  machine: { rapid: 8000, tcp: { x: 150, y: 75, z: 150 }, maxRpm: 24000, res: 560, vise: false },
   tools: [
     { nr: 1, name: 'Schaftfräser', type: 'flat', D: 10, rc: 0, angle: 118, tipD: 0, lc: 22, L: 60, z: 3 },
     { nr: 2, name: 'Spiralbohrer HSS', type: 'drill', D: 8, rc: 0, angle: 118, tipD: 0, lc: 45, L: 80, z: 2 },
@@ -2145,7 +2384,8 @@ const DEFAULTS = {
     { nr: 6, name: 'Torusfräser', type: 'torus', D: 16, rc: 2, angle: 118, tipD: 0, lc: 25, L: 70, z: 4 },
     { nr: 7, name: 'NC-Anbohrer', type: 'center', D: 10, rc: 0, angle: 90, tipD: 0, lc: 6, L: 50, z: 2 },
     { nr: 8, name: 'Gewindebohrer M8', type: 'tap', D: 8, rc: 0, angle: 118, tipD: 0, lc: 22, L: 70, z: 3 },
-    { nr: 9, name: 'Spiralbohrer Ø6,8', type: 'drill', D: 6.8, rc: 0, angle: 118, tipD: 0, lc: 40, L: 75, z: 2 }
+    { nr: 9, name: 'Spiralbohrer Ø6,8', type: 'drill', D: 6.8, rc: 0, angle: 118, tipD: 0, lc: 40, L: 75, z: 2 },
+    { nr: 10, name: 'Gewindefräser P1,5', type: 'thread', D: 12, rc: 0, angle: 118, tipD: 0, lc: 11, L: 60, z: 3 }
   ]
 };
 
@@ -2157,7 +2397,8 @@ const TOOL_TYPES = {
   drill:   { label: 'Spiralbohrer',      fields: ['D', 'angle', 'lc', 'L', 'z'] },
   center:  { label: 'NC-Anbohrer',       fields: ['D', 'angle', 'lc', 'L', 'z'] },
   chamfer: { label: 'Fasenfräser',       fields: ['D', 'tipD', 'angle', 'lc', 'L', 'z'] },
-  tap:     { label: 'Gewindebohrer',     fields: ['D', 'lc', 'L', 'z'] }
+  tap:     { label: 'Gewindebohrer',     fields: ['D', 'lc', 'L', 'z'] },
+  thread:  { label: 'Gewindefräser',     fields: ['D', 'lc', 'L', 'z'] }
 };
 
 const EXAMPLES = [
@@ -2297,20 +2538,20 @@ N50 G79 X30 Y45 Z0
 N60 G73 ZI-5 R16 RZ4 D2.5 V2 E150 H1 W10
 N70 G79 X75 Y45 Z0
 (NUT 40x12)
-N80 G74 ZI-3 LP40 BP12 D1.5 V2 H1 W10
+N80 G74 ZI-3 LP40 BP12 D1.5 V2 EP0 H1 W10
 N90 G79 X50 Y14 Z0
 (ZENTRIEREN: LOCHREIHE UND LOCHKREIS IM TASCHENBODEN)
 N100 T7 M6 (NC-ANBOHRER)
 N110 S2500 F250 M13
 N120 G81 ZI-2.5 V2 W10
 N130 G76 X15 Y72 Z0 AS0 D23.333 O4
-N140 G77 IA30 JA45 R9 AN90 O3 Z-6
+N140 G77 IA30 JA45 R9 AN90 AI120 O3 Z-6
 (BOHREN MIT SPANBRUCH)
 N150 T9 M6 (SPIRALBOHRER 6,8)
 N160 S2300 F230 M13
 N170 G82 ZI-16 D6 V2 W10
 N180 G76 X15 Y72 Z0 AS0 D23.333 O4
-N190 G77 IA30 JA45 R9 AN90 O3 Z-6
+N190 G77 IA30 JA45 R9 AN90 AI120 O3 Z-6
 (GEWINDE M8 IN DER LOCHREIHE)
 N200 T8 M6 (GEWINDEBOHRER M8)
 N210 S400 M13
@@ -2319,6 +2560,36 @@ N230 G76 X15 Y72 Z0 AS0 D23.333 O4
 N240 G0 Z100 M9
 N250 M5
 N260 M30
+`
+  },
+  {
+    id: 'sonder', name: 'Zapfen, Stufe, Fase, Bohr- und Gewindefräsen',
+    code: `%500 (ZAPFEN, STUFE, FASE, G87, G88)
+N10 G17 G54 G90 G94
+(RECHTECKTASCHE MIT ZAPFEN, ZAPFEN 4 MM NIEDRIGER)
+N180 T1 M6 (SCHAFTFRAESER D10)
+N190 S3200 F600 M13
+N200 G72 ZA-8 LP44 BP36 RN6 LZ16 BZ12 RZ3 HI4 D2 V2 AK0.4 AL0.2 E150 H14 W10
+N210 G79 X28 Y44 Z0
+(KREISTASCHE MIT STUFE)
+N220 G73 ZA-10 R10 D2.5 V2 QM2 BA4 WA3 E150 H14 W10
+N230 G79 X75 Y56 Z0
+(BOHRFRAESEN KERNLOCH 18,5 FUER M20x1,5)
+N240 G87 ZA-16 R9.25 D2 V2 BG3 W10
+N250 G79 X75 Y22 Z0
+(FASEN AN TASCHE UND ZAPFEN)
+N260 T4 M6 (FASENFRAESER 90 GRAD)
+N270 S6000 F500 M13
+N280 G72 ZA-8 LP44 BP36 RN6 LZ16 BZ12 RZ3 HI4 D2 V2 QM-1 CB1 W10
+N290 G79 X28 Y44 Z0
+(INNENGEWINDE M20x1,5 VON UNTEN NACH OBEN)
+N300 T10 M6 (GEWINDEFRAESER P1,5)
+N310 S5000 F400 M13
+N320 G88 ZA-15 DN20 D-1.5 Q7 V2 BG3 W10
+N330 G79 X75 Y22 Z0
+N340 G0 Z100 M9
+N350 M5
+N360 M30
 `
   },
   {
@@ -2411,7 +2682,7 @@ N110 M30
   const mk = (nrs, stock = {}, extra = {}) => {
     const st = { ...DEFAULTS.stock, ...stock };
     return {
-      v: 4,
+      v: 7,
       tools: DEFAULTS.tools.filter(t => !nrs || nrs.includes(t.nr)).map(t => ({ ...t, ...(extra[t.nr] || {}) })),
       stock: st,
       zero: { ...JSON.parse(JSON.stringify(DEFAULTS.zero)), G54: { x: st.x0, y: st.y0, z: 12 + st.H } },
@@ -2422,6 +2693,7 @@ N110 M30
     grundplatte: mk([5, 1, 2, 4], { mat: 'alu' }),
     kontur: mk([1], { mat: 'steel' }),
     zyklen: mk([1, 7, 9, 8], { mat: 'alu' }),
+    sonder: mk([1, 4, 10], { mat: 'alu' }),
     polar: mk([3], { mat: 'pom' }),
     radien: mk([3], { mat: 'alu' }),
     vorlage: mk(null, { mat: 'alu' })
@@ -2443,6 +2715,7 @@ const CMDHELP = (() => {
     g2: svg('Skizze: Kreisbogen im Uhrzeigersinn von S nach E um den Mittelpunkt M, I und J vom Startpunkt aus', `<path d="M14 136H140M14 136V10" ${ax}/><path d="M34 116A60 60 0 0 1 94 56" stroke="#e8590c" stroke-width="3" fill="none"/>${arrow(94, 56, 0)}<path d="M34 116H94" stroke="#1d4f86" stroke-width="1.6" stroke-dasharray="4 3"/><path d="M94 116V56" stroke="#1d4f86" stroke-width="1.6" stroke-dasharray="4 3"/>${dot(34, 116)}${dot(94, 56)}${dot(94, 116, '#1d4f86', 4)}${T(22, 110, 'S')}${T(100, 52, 'E')}${T(99, 130, 'M', '#1d4f86')}${T(58, 130, 'I', '#1d4f86', 'IBM Plex Mono')}${T(100, 90, 'J', '#1d4f86', 'IBM Plex Mono')}`),
     g3: svg('Skizze: Kreisbogen gegen den Uhrzeigersinn von S nach E um den Mittelpunkt M, I und J vom Startpunkt aus', `<path d="M14 136H140M14 136V10" ${ax}/><path d="M94 116A60 60 0 0 0 34 56" stroke="#e8590c" stroke-width="3" fill="none"/>${arrow(34, 56, 180)}<path d="M94 116H34" stroke="#1d4f86" stroke-width="1.6" stroke-dasharray="4 3"/><path d="M34 116V56" stroke="#1d4f86" stroke-width="1.6" stroke-dasharray="4 3"/>${dot(94, 116)}${dot(34, 56)}${dot(34, 116, '#1d4f86', 4)}${T(100, 120, 'S')}${T(22, 50, 'E')}${T(22, 130, 'M', '#1d4f86')}${T(62, 130, 'I', '#1d4f86', 'IBM Plex Mono')}${T(40, 90, 'J', '#1d4f86', 'IBM Plex Mono')}`),
     comp: svg('Skizze: Fräserradiuskorrektur, Werkzeug G41 links und G42 rechts der Kontur in Vorschubrichtung', `<path d="M10 76H136" stroke="#1c232b" stroke-width="3"/>${arrow(136, 76, 0, '#1c232b')}<circle cx="60" cy="56" r="18" fill="#d3e1f0" stroke="#1d4f86" stroke-width="2"/><circle cx="96" cy="96" r="18" fill="#fde2cf" stroke="#e8590c" stroke-width="2"/>${T(44, 30, 'G41 links', '#1d4f86', 'IBM Plex Mono')}${T(70, 132, 'G42 rechts', '#c4470a', 'IBM Plex Mono')}${T(12, 68, 'Kontur', '#5b6570')}`),
+    lin: svg('Skizze: lineares tangentiales Anfahren mit G45 auf einer Geraden der Länge DL an den ersten Konturpunkt', `<path d="M10 110H140" stroke="#1c232b" stroke-width="3"/><path d="M30 38V108" stroke="#e8590c" stroke-width="2.5" stroke-dasharray="6 4"/><path d="M30 104H86" stroke="#e8590c" stroke-width="3"/>${arrow(86, 104, 0)}${dot(30, 104, '#e8590c', 4)}${dot(92, 110)}<path d="M30 124H92M30 118v12M92 118v12" stroke="#1d4f86" stroke-width="1.4"/>${T(52, 142, 'DL', '#1d4f86', 'IBM Plex Mono')}${T(56, 92, 'Konturpunkt', '#5b6570')}${T(14, 30, 'Start', '#5b6570')}`),
     appr: svg('Skizze: tangentiales Anfahren im Viertelkreis G46 und Halbkreis G47 mit Radius RR an den ersten Konturpunkt', `<path d="M10 110H140" stroke="#1c232b" stroke-width="3"/><path d="M40 60A50 50 0 0 0 90 110" stroke="#e8590c" stroke-width="2.5" fill="none" stroke-dasharray="6 4"/><path d="M40 60V30" stroke="#e8590c" stroke-width="2.5" stroke-dasharray="6 4"/>${dot(90, 110)}${dot(40, 60, '#e8590c', 4)}<path d="M90 110L90 60" stroke="#1d4f86" stroke-width="1.4"/>${T(94, 88, 'RR', '#1d4f86', 'IBM Plex Mono')}${T(84, 132, 'erster Konturpunkt', '#5b6570')}${T(14, 26, 'Start', '#5b6570')}`),
     polar: svg('Skizze: Polarkoordinaten mit Pol, Radius RP und Winkel AP zur X-Achse', `<path d="M14 136H140M14 136V10" ${ax}/><path d="M40 110H130" stroke="#9aa3ad" stroke-dasharray="4 3"/><path d="M40 110L112 46" stroke="#e8590c" stroke-width="3"/>${arrow(112, 46, -41.6)}<path d="M80 110A40 40 0 0 0 70 84" stroke="#1d4f86" stroke-width="1.5" fill="none"/>${dot(40, 110, '#1d4f86')}${dot(112, 46)}${T(22, 128, 'Pol', '#1d4f86')}${T(84, 102, 'AP', '#1d4f86', 'IBM Plex Mono')}${T(66, 70, 'RP', '#1d4f86', 'IBM Plex Mono')}`),
     rect: svg('Skizze: Rechtecktasche mit Länge LP, Breite BP und Eckenradius RN, Bezugspunkt Mitte', `<rect x="20" y="36" width="110" height="74" rx="14" fill="#fde2cf" stroke="#e8590c" stroke-width="2.5"/><path d="M20 126H130M20 120v12M130 120v12" stroke="#1d4f86" stroke-width="1.4"/><path d="M142 36V110M136 36h12M136 110h12" stroke="#1d4f86" stroke-width="1.4"/>${dot(75, 73, '#1d4f86', 4)}${T(66, 142, 'LP', '#1d4f86', 'IBM Plex Mono')}${T(124, 28, 'BP', '#1d4f86', 'IBM Plex Mono')}${T(24, 30, 'RN', '#1d4f86', 'IBM Plex Mono')}${T(80, 70, 'EP0', '#5b6570', 'IBM Plex Mono')}`),
@@ -2451,19 +2724,20 @@ const CMDHELP = (() => {
     drill: svg('Skizze: Bohrzyklus, Sicherheitsabstand V über der Oberfläche, Tiefe ZI ab Oberfläche bzw. ZA absolut, Rückzugsebene W', `<rect x="10" y="62" width="130" height="80" fill="#e6e9ed" stroke="#9aa3ad"/><rect x="62" y="62" width="26" height="56" fill="#fff"/><path d="M62 118L75 132L88 118" fill="#fff"/><path d="M75 14V128" stroke="#e8590c" stroke-width="2.5" stroke-dasharray="6 4"/><path d="M100 14H140" stroke="#1d4f86" stroke-width="1.4"/><path d="M100 46H140" stroke="#1d4f86" stroke-width="1.4" stroke-dasharray="3 3"/>${T(118, 12, 'W', '#1d4f86', 'IBM Plex Mono')}${T(122, 42, 'V', '#1d4f86', 'IBM Plex Mono')}<path d="M24 62V128M18 62h12M18 128h12" stroke="#1d4f86" stroke-width="1.4"/>${T(30, 100, 'ZI', '#1d4f86', 'IBM Plex Mono')}`),
     holes: svg('Skizze: Lochkreis mit Mittelpunkt IA JA, Radius R, Startwinkel AN und Teilungswinkel AI', `<circle cx="75" cy="75" r="50" fill="none" stroke="#9aa3ad" stroke-dasharray="4 3"/>${[0, 60, 120, 180, 240, 300].map(a => `<circle cx="${(75 + 50 * Math.cos(a * Math.PI / 180)).toFixed(1)}" cy="${(75 - 50 * Math.sin(a * Math.PI / 180)).toFixed(1)}" r="8" fill="#fde2cf" stroke="#e8590c" stroke-width="2"/>`).join('')}<path d="M75 75L125 75" stroke="#1d4f86" stroke-width="1.4"/>${dot(75, 75, '#1d4f86', 4)}${T(92, 70, 'R', '#1d4f86', 'IBM Plex Mono')}${T(44, 92, 'IA JA', '#1d4f86', 'IBM Plex Mono')}<path d="M100 75A25 25 0 0 0 87.5 53.3" stroke="#1d4f86" fill="none"/>${T(96, 58, 'AI', '#1d4f86', 'IBM Plex Mono')}`),
     grid: svg('Skizze: Bohrbild auf einer Geraden, erster Punkt X Y, Richtung AS, Abstand D und Anzahl O', `<path d="M14 136H140M14 136V10" ${ax}/>${[0, 1, 2, 3].map(k => `<circle cx="${30 + k * 30}" cy="${110 - k * 18}" r="8" fill="#fde2cf" stroke="#e8590c" stroke-width="2"/>`).join('')}<path d="M30 110L120 56" stroke="#1d4f86" stroke-dasharray="4 3"/>${T(18, 130, 'X Y', '#1d4f86', 'IBM Plex Mono')}${T(56, 84, 'D', '#1d4f86', 'IBM Plex Mono')}${T(98, 42, 'O = 4', '#1d4f86', 'IBM Plex Mono')}`),
-    shift: svg('Skizze: Nullpunktverschiebung G59 um XA YA und Drehung WA', `<path d="M14 136H140M14 136V10" ${ax}/>${T(20, 26, 'W', '#5b6570')}<g transform="translate(70 96) rotate(-25)"><path d="M0 0H52M0 0V-52" stroke="#e8590c" stroke-width="2.5"/></g>${dot(70, 96, '#e8590c')}<path d="M14 136L70 96" stroke="#1d4f86" stroke-dasharray="4 3"/>${T(34, 128, 'XA YA', '#1d4f86', 'IBM Plex Mono')}<path d="M110 96A40 40 0 0 0 106 79" stroke="#1d4f86" fill="none"/>${T(114, 90, 'WA', '#1d4f86', 'IBM Plex Mono')}`)
+    shift: svg('Skizze: Nullpunktverschiebung G59 um XA YA und Drehung WA', `<path d="M14 136H140M14 136V10" ${ax}/>${T(20, 26, 'W', '#5b6570')}<g transform="translate(70 96) rotate(-25)"><path d="M0 0H52M0 0V-52" stroke="#e8590c" stroke-width="2.5"/></g>${dot(70, 96, '#e8590c')}<path d="M14 136L70 96" stroke="#1d4f86" stroke-dasharray="4 3"/>${T(34, 128, 'XA YA', '#1d4f86', 'IBM Plex Mono')}<path d="M110 96A40 40 0 0 0 106 79" stroke="#1d4f86" fill="none"/>${T(114, 90, 'WA', '#1d4f86', 'IBM Plex Mono')}`),
+    helix: svg('Skizze: Schraubenlinie des Fräsers in der Bohrung, Zustellung D je Umlauf, Bohrungsradius R bzw. Nenndurchmesser DN', `<rect x="10" y="30" width="130" height="112" fill="#e6e9ed" stroke="#9aa3ad"/><rect x="40" y="30" width="70" height="96" fill="#fff"/><path d="M40 30V126H110V30" stroke="#1c232b" stroke-width="1.5" fill="none"/>${[0, 1, 2, 3].map(k => `<path d="M48 ${40 + k * 20}Q75 ${52 + k * 20} 102 ${46 + k * 20}" stroke="#e8590c" stroke-width="2.5" fill="none"/><path d="M102 ${46 + k * 20}Q75 ${40 + k * 20} 48 ${60 + k * 20}" stroke="#e8590c" stroke-width="1.5" stroke-dasharray="3 3" fill="none"/>`).join('')}<path d="M120 46v20M114 46h12M114 66h12" stroke="#1d4f86" stroke-width="1.4"/>${T(124, 62, 'D', '#1d4f86', 'IBM Plex Mono')}<path d="M40 18H110M40 12v12M110 12v12" stroke="#1d4f86" stroke-width="1.4"/>${T(62, 12, 'R · DN', '#1d4f86', 'IBM Plex Mono')}`)
   };
   const H = {
     G0: { t: 'G0 · Eilgang', sk: 'g0', p: [['X Y Z', 'Zielpunkt (G90 absolut, G91 inkremental)'], ['XA XI …', 'einzelne Achse absolut bzw. inkremental']], n: 'Nur außerhalb des Materials verfahren.' },
-    G1: { t: 'G1 · Gerade mit Vorschub', sk: 'g1', p: [['X Y Z', 'Endpunkt'], ['D', 'Länge der Geraden'], ['AS', 'Anstiegswinkel zur X-Achse'], ['RN', 'Rundung (+) / Fase (−) zum nächsten Element'], ['F', 'Vorschub in mm/min']] },
-    G2: { t: 'G2 · Kreis im Uhrzeigersinn', sk: 'g2', p: [['X Y', 'Endpunkt'], ['I J', 'Mittelpunkt, inkremental vom Startpunkt'], ['IA JA', 'Mittelpunkt absolut'], ['R', 'Radius statt I/J (R− für Bogen > 180°)'], ['AO', 'Öffnungswinkel'], ['RN', 'Rundung (+) / Fase (−) zum nächsten Element']], n: 'Mit Z zusätzlich: Schraubenlinie.' },
-    G3: { t: 'G3 · Kreis gegen den Uhrzeigersinn', sk: 'g3', p: [['X Y', 'Endpunkt'], ['I J', 'Mittelpunkt, inkremental vom Startpunkt'], ['IA JA', 'Mittelpunkt absolut'], ['R', 'Radius statt I/J (R− für Bogen > 180°)'], ['AO', 'Öffnungswinkel'], ['RN', 'Rundung (+) / Fase (−) zum nächsten Element']], n: 'Mit Z zusätzlich: Schraubenlinie.' },
+    G1: { t: 'G1 · Gerade mit Vorschub', sk: 'g1', p: [['X Y Z', 'Endpunkt'], ['D', 'Länge der Geraden'], ['AS', 'Anstiegswinkel zur X-Achse'], ['RN', 'Rundung (+) / Fase (−) zum nächsten Element'], ['F', 'Vorschub in mm/min']], n: 'Nach PAL sind alle Adressen optional.' },
+    G2: { t: 'G2 · Kreis im Uhrzeigersinn', sk: 'g2', p: [['X Y', 'Endpunkt'], ['I J', 'Mittelpunkt, inkremental vom Startpunkt'], ['IA JA', 'Mittelpunkt absolut'], ['R', 'Radius statt I/J (R− für Bogen > 180°)'], ['AO', 'Öffnungswinkel'], ['RN', 'Rundung (+) / Fase (−) zum nächsten Element'], ['AS', 'Anstiegswinkel der Verfahrstrecke']], n: 'Mittelpunkt über I/J, IA/JA, R oder AO – eine Angabe ist nötig. Mit Z zusätzlich: Schraubenlinie.' },
+    G3: { t: 'G3 · Kreis gegen den Uhrzeigersinn', sk: 'g3', p: [['X Y', 'Endpunkt'], ['I J', 'Mittelpunkt, inkremental vom Startpunkt'], ['IA JA', 'Mittelpunkt absolut'], ['R', 'Radius statt I/J (R− für Bogen > 180°)'], ['AO', 'Öffnungswinkel'], ['RN', 'Rundung (+) / Fase (−) zum nächsten Element'], ['AS', 'Anstiegswinkel der Verfahrstrecke']], n: 'Mittelpunkt über I/J, IA/JA, R oder AO – eine Angabe ist nötig. Mit Z zusätzlich: Schraubenlinie.' },
     G4: { t: 'G4 · Verweilzeit', p: [['U', 'Verweilzeit in Sekunden']] },
     G9: { t: 'G9 · Genauhalt', p: [], n: 'Satzweise wirksam; im Simulator ohne sichtbare Wirkung.' },
-    G10: { t: 'G10 · Eilgang polar', sk: 'polar', p: [['RP', 'Polradius'], ['AP', 'Polarwinkel absolut'], ['AI', 'Polarwinkel inkrementell'], ['IA JA', 'Pol absolut'], ['I J', 'Pol inkremental zur Position']] },
+    G10: { t: 'G10 · Eilgang polar', sk: 'polar', p: [['RP', 'Polradius'], ['AP', 'Polarwinkel absolut'], ['AI', 'Polarwinkel inkrementell'], ['IA JA', 'Pol absolut'], ['I J', 'Pol inkremental zur Position'], ['Z ZA', 'Z-Koordinate der Anfahrt']] },
     G11: { t: 'G11 · Gerade polar', sk: 'polar', p: [['RP', 'Polradius'], ['AP', 'Polarwinkel absolut'], ['AI', 'Polarwinkel inkrementell'], ['IA JA', 'Pol absolut'], ['I J', 'Pol inkremental zur Position'], ['RN', 'Rundung / Fase']] },
-    G12: { t: 'G12 · Kreis polar im Uhrzeigersinn', sk: 'polar', p: [['AP', 'Endwinkel absolut'], ['AI', 'Winkel inkrementell'], ['IA JA', 'Pol = Kreismittelpunkt'], ['RN', 'Rundung / Fase']] },
-    G13: { t: 'G13 · Kreis polar gegen Uhrzeigersinn', sk: 'polar', p: [['AP', 'Endwinkel absolut'], ['AI', 'Winkel inkrementell'], ['IA JA', 'Pol = Kreismittelpunkt'], ['RN', 'Rundung / Fase']] },
+    G12: { t: 'G12 · Kreis polar im Uhrzeigersinn', sk: 'polar', p: [['AP', 'Endwinkel absolut'], ['AI', 'Winkel inkrementell'], ['RP', 'Polarradius'], ['IA JA', 'Pol = Kreismittelpunkt'], ['RN', 'Rundung / Fase']] },
+    G13: { t: 'G13 · Kreis polar gegen Uhrzeigersinn', sk: 'polar', p: [['AP', 'Endwinkel absolut'], ['AI', 'Winkel inkrementell'], ['RP', 'Polarradius'], ['IA JA', 'Pol = Kreismittelpunkt'], ['RN', 'Rundung / Fase']] },
     G14: { t: 'G14 · Werkzeugwechselpunkt anfahren', p: [['H0', 'alle Achsen gleichzeitig'], ['H1', 'erst Z, dann X/Y (Standard)'], ['H2', 'erst X/Y, dann Z']] },
     G17: { t: 'G17 · Ebene XY', p: [], n: 'Radiuskorrektur, RN und Polarkoordinaten wirken nur in G17.' },
     G18: { t: 'G18 · Ebene ZX', p: [['K I', 'Kreismittelpunkt in Z/X']] },
@@ -2473,7 +2747,7 @@ const CMDHELP = (() => {
     G40: { t: 'G40 · Radiuskorrektur aus', p: [['X Y', 'Punkt nach Abwahl'], ['G45 G46 G47', 'tangential abfahren'], ['WV', 'Rückzugsebene beim Abfahren']] },
     G41: { t: 'G41 · Werkzeug links der Kontur', sk: 'comp', p: [['X Y', 'erster Konturpunkt'], ['Z', 'Frästiefe'], ['G45 DL', 'Anfahren auf Gerade der Länge DL'], ['G46 RR', 'Anfahren im Viertelkreis'], ['G47 RR', 'Anfahren im Halbkreis'], ['WV', 'Sicherheitsebene'], ['O1 / O2', 'erst zustellen / Zustellung beim Anfahren']], n: 'Gleichlauf: außen im Uhrzeigersinn, innen gegen den Uhrzeigersinn.' },
     G42: { t: 'G42 · Werkzeug rechts der Kontur', sk: 'comp', p: [['X Y', 'erster Konturpunkt'], ['Z', 'Frästiefe'], ['G45 DL', 'Anfahren auf Gerade der Länge DL'], ['G46 RR', 'Anfahren im Viertelkreis'], ['G47 RR', 'Anfahren im Halbkreis'], ['WV', 'Sicherheitsebene'], ['O1 / O2', 'erst zustellen / Zustellung beim Anfahren']], n: 'Gegenlauf: außen gegen den Uhrzeigersinn.' },
-    G45: { t: 'G45 · tangential auf Gerade', sk: 'appr', p: [['DL', 'Länge der An-/Abfahrgeraden'], ['WV', 'Sicherheits- bzw. Rückzugsebene']] },
+    G45: { t: 'G45 · tangential auf Gerade', sk: 'lin', p: [['DL', 'Länge der An-/Abfahrgeraden'], ['X Y Z', 'Konturpunkt'], ['O', 'Zustellbewegung'], ['WV', 'Sicherheits- bzw. Rückzugsebene']] },
     G46: { t: 'G46 · tangential im Viertelkreis', sk: 'appr', p: [['RR', 'Radius der Fräsermittelpunktsbahn'], ['WV', 'Sicherheits- bzw. Rückzugsebene']] },
     G47: { t: 'G47 · tangential im Halbkreis', sk: 'appr', p: [['RR', 'Radius der Fräsermittelpunktsbahn'], ['WV', 'Sicherheits- bzw. Rückzugsebene']] },
     G50: { t: 'G50 · Verschiebungen aufheben', p: [], n: 'Hebt G58/G59 (Verschiebung und Drehung) auf.' },
@@ -2482,19 +2756,23 @@ const CMDHELP = (() => {
     G58: { t: 'G58 · Verschiebung polar', sk: 'shift', p: [['RP AP', 'Verschiebung polar'], ['ZI ZA', 'Verschiebung in Z'], ['WI WA', 'Drehung inkremental / absolut']] },
     G59: { t: 'G59 · Verschiebung und Drehung', sk: 'shift', p: [['XA YA ZA', 'Verschiebung absolut zum Nullpunkt'], ['XI YI ZI', 'Verschiebung inkremental'], ['WA', 'Drehung absolut (Grad)'], ['WI', 'Drehung inkremental']] },
     G66: { t: 'G66 · Spiegeln', p: [['X', 'an der Y-Achse spiegeln (X wird negativ)'], ['Y', 'an der X-Achse spiegeln']], n: 'G66 ohne Adresse hebt das Spiegeln auf.' },
-    G72: { t: 'G72 · Rechtecktasche', sk: 'rect', p: [['LP BP', 'Länge / Breite'], ['RN', 'Eckenradius'], ['ZI ZA', 'Tiefe ab Oberfläche / absolut'], ['D', 'Zustellung je Schnitt'], ['V', 'Sicherheitsabstand über der Oberfläche'], ['W', 'Rückzugsebene absolut'], ['AK AL', 'Aufmaß Rand / Boden'], ['EP', 'Bezug: 0 Mitte, 1 Ecke links unten'], ['H', '1 Schruppen, 4 Schlichten, 14 beides']], n: 'Aufruf mit G79 X Y Z (Z = Oberfläche).' },
-    G73: { t: 'G73 · Kreistasche', sk: 'circ', p: [['R', 'Taschenradius'], ['RZ', 'Zapfenradius (Ringnut)'], ['ZI ZA', 'Tiefe'], ['D', 'Zustellung'], ['V', 'Sicherheitsabstand über der Oberfläche'], ['W', 'Rückzugsebene absolut'], ['AK AL', 'Aufmaß'], ['H', '1 / 4 / 14']], n: 'Aufruf mit G79 X Y Z am Mittelpunkt.' },
-    G74: { t: 'G74 · Nut', sk: 'slot', p: [['LP BP', 'Länge / Breite'], ['ZI ZA', 'Tiefe'], ['D', 'Zustellung'], ['V', 'Sicherheitsabstand über der Oberfläche'], ['W', 'Rückzugsebene absolut'], ['EP', '0 Mitte, 1 Mittelpunkt linker Bogen'], ['H', '1 / 4 / 14']] },
-    G75: { t: 'G75 · Kreisbogennut', p: [['BP', 'Nutbreite'], ['RP', 'Radius der Nutmitte'], ['AN', 'Startwinkel'], ['AO AP', 'Öffnungswinkel / Endwinkel'], ['ZI ZA', 'Tiefe'], ['D', 'Zustellung'], ['V', 'Sicherheitsabstand über der Oberfläche'], ['W', 'Rückzugsebene absolut']] },
-    G76: { t: 'G76 · Zyklus auf Gerade / Gitter', sk: 'grid', p: [['X Y Z', 'erster Punkt, Z = Oberfläche'], ['AS', 'Richtung'], ['D', 'Abstand der Punkte'], ['O', 'Anzahl'], ['Q1 Q2', 'Rahmen / Gitter mit DI AI OI']] },
-    G77: { t: 'G77 · Zyklus auf Lochkreis', sk: 'holes', p: [['IA JA', 'Mittelpunkt'], ['R', 'Lochkreisradius'], ['AN', 'Startwinkel'], ['AI AP', 'Teilungswinkel / Endwinkel'], ['O', 'Anzahl'], ['Z', 'Oberfläche'], ['H2', 'zwischen den Positionen auf W']] },
-    G78: { t: 'G78 · Zyklus an Polarpunkt', sk: 'polar', p: [['IA JA', 'Pol'], ['RP AP', 'Radius / Winkel'], ['Z', 'Oberfläche']] },
-    G79: { t: 'G79 · Zyklus an einem Punkt', p: [['X Y', 'Bezugspunkt der Geometrie'], ['Z', 'Materialoberfläche'], ['AR', 'Drehung der Zyklusgeometrie']] },
+    G72: { t: 'G72 · Rechtecktasche', sk: 'rect', p: [['LP BP', 'Länge / Breite'], ['RN', 'Eckenradius'], ['ZI ZA', 'Tiefe ab Oberfläche / absolut'], ['D', 'Zustellung je Schnitt'], ['V', 'Sicherheitsabstand über der Oberfläche'], ['W', 'Rückzugsebene absolut'], ['AK AL', 'Aufmaß Rand / Boden'], ['EP', 'Setzpunkt: 0 Mitte (Standard), 1 rechts oben, 2 links oben, 3 links unten, 4 rechts unten'], ['H', '1 Schruppen, 4 Schlichten, 14 beides'], ['E', 'Eintauchvorschub'], ['LZ BZ', 'Länge / Breite des zentrischen Zapfens'], ['RZ', 'Verrundungsradius des Zapfens'], ['HA HI', 'Zapfenhöhe absolut / ab Taschenboden (≤ Materialoberfläche)'], ['QM', 'Bearbeitungsauswahl: 1 ohne Stufen (Standard), 2 mit Stufen, −1 Fasen'], ['BA WA', 'Stufenbreite / Stufentiefe (mit QM2)'], ['CB', 'Fasenbreite (mit QM−1, Fas- oder Zentrierwerkzeug)'], ['CM', 'Arbeitspunkt auf der Schneide des Faswerkzeugs in % (Standard 50)'], ['RM', 'Mindestradius der Schruppbahnen in % des Fräserdurchmessers']], n: 'Aufruf mit G79 X Y Z (Z = Oberfläche).' },
+    G73: { t: 'G73 · Kreistasche', sk: 'circ', p: [['R', 'Taschenradius'], ['RZ', 'Zapfenradius (Ringnut)'], ['ZI ZA', 'Tiefe'], ['D', 'Zustellung'], ['V', 'Sicherheitsabstand über der Oberfläche'], ['W', 'Rückzugsebene absolut'], ['AK AL', 'Aufmaß'], ['H', '1 / 4 / 14'], ['HA HI', 'Zapfenhöhe absolut / ab Taschenboden'], ['QM', 'Bearbeitungsauswahl: 1 ohne Stufen (Standard), 2 mit Stufen, −1 Fasen'], ['BA WA', 'Stufenbreite / Stufentiefe (mit QM2)'], ['CB', 'Fasenbreite (mit QM−1, Fas- oder Zentrierwerkzeug)'], ['CM', 'Arbeitspunkt auf der Schneide des Faswerkzeugs in % (Standard 50)'], ['RM', 'Mindestradius der Schruppbahnen in % des Fräserdurchmessers']], n: 'Aufruf mit G79 X Y Z am Mittelpunkt.' },
+    G74: { t: 'G74 · Nut', sk: 'slot', p: [['LP BP', 'Länge / Breite'], ['ZI ZA', 'Tiefe'], ['D', 'Zustellung'], ['V', 'Sicherheitsabstand über der Oberfläche'], ['W', 'Rückzugsebene absolut'], ['EP', 'Setzpunkt: 3 linker Bogenmittelpunkt (Standard), 0 Mitte, 1 rechter Bogenmittelpunkt'], ['H', '1 / 4 / 14'], ['QM', 'Bearbeitungsauswahl: 1 ohne Stufen (Standard), 2 mit Stufen, −1 Fasen'], ['BA WA', 'Stufenbreite / Stufentiefe (mit QM2)'], ['CB', 'Fasenbreite (mit QM−1, Fas- oder Zentrierwerkzeug)'], ['CM', 'Arbeitspunkt auf der Schneide des Faswerkzeugs in % (Standard 50)'], ['RM', 'Mindestradius der Schruppbahnen in % des Fräserdurchmessers']] },
+    G75: { t: 'G75 · Kreisbogennut', p: [['BP', 'Nutbreite'], ['RP', 'Radius der Nutmitte'], ['AN', 'Startwinkel'], ['AO AP', 'Öffnungswinkel / Endwinkel'], ['ZI ZA', 'Tiefe'], ['D', 'Zustellung'], ['V', 'Sicherheitsabstand über der Oberfläche'], ['W', 'Rückzugsebene absolut'], ['QM', 'Bearbeitungsauswahl: 1 ohne Stufen (Standard), 2 mit Stufen, −1 Fasen'], ['BA WA', 'Stufenbreite / Stufentiefe (mit QM2)'], ['CB', 'Fasenbreite (mit QM−1, Fas- oder Zentrierwerkzeug)'], ['CM', 'Arbeitspunkt auf der Schneide des Faswerkzeugs in % (Standard 50)'], ['RM', 'Mindestradius der Schruppbahnen in % des Fräserdurchmessers']] },
+    G87: { t: 'G87 · Bohrfräsen', sk: 'helix', p: [['ZI ZA', 'Bohrungstiefe ab Oberfläche / absolut'], ['R', 'Radius der Bohrung'], ['D', 'Zustellung pro Schraubenlinie (Helix-Steigung)'], ['V', 'Sicherheitsabstand über der Oberfläche'], ['BG', 'BG2 im Uhrzeigersinn, BG3 gegen den Uhrzeigersinn (ohne: BG3)'], ['W', 'Rückzugsebene absolut']], n: 'Der Fräser fährt auf einer Schraubenlinie in die Tiefe und am Grund einen Vollkreis. Aufruf mit G79 am Bohrungsmittelpunkt.' },
+    G88: { t: 'G88 · Innengewindefräsen', sk: 'helix', p: [['ZI ZA', 'Gewindetiefe'], ['DN', 'Nenndurchmesser des Gewindes'], ['D', 'Steigung: D+ von oben nach unten, D− von unten nach oben'], ['Q', 'Anzahl der Gewinderillen am Fräser'], ['V', 'Sicherheitsabstand über der Oberfläche'], ['BG', 'BG2 im Uhrzeigersinn, BG3 gegen den Uhrzeigersinn'], ['W', 'Rückzugsebene absolut']], n: 'Rechtsgewinde: BG2 mit D+ oder BG3 mit D−. Linksgewinde: BG2 mit D− oder BG3 mit D+. Kernloch vorher bohren.' },
+    G15: { t: 'G15 · Schwenken', p: [], n: 'Schwenken der Bearbeitungsebene ist in dieser Simulationssoftware nicht möglich. Die Simulation bricht an diesem Satz ab.' },
+    G16: { t: 'G16 · Ebene drehen', p: [], n: 'Schwenken der Bearbeitungsebene ist in dieser Simulationssoftware nicht möglich. Die Simulation bricht an diesem Satz ab.' },
+    G76: { t: 'G76 · Zyklus auf Gerade / Gitter', sk: 'grid', p: [['AS', 'Winkel der Geraden zur X-Achse'], ['D', 'Abstand der Aufrufpunkte'], ['O', 'Anzahl der Aufrufpunkte'], ['X Y Z', 'erster Punkt, Z = Oberfläche (ohne: aktuelle Position)'], ['AR', 'Drehwinkel des Objekts'], ['Q1 Q2', 'Rahmen / Gitter mit DI AI OI']] },
+    G77: { t: 'G77 · Zyklus auf Lochkreis', sk: 'holes', p: [['IA JA', 'Mittelpunkt (ohne: aktuelle Position)'], ['R', 'Lochkreisradius'], ['AN', 'Startwinkel (ohne: 0°)'], ['O', 'Anzahl der Aufrufpunkte'], ['AI AP', 'Segmentwinkel / Endwinkel'], ['Z', 'Materialoberfläche'], ['RI', 'Radiusinkrement konzentrischer Kreise'], ['OI', 'Anzahl konzentrischer Kreise'], ['H1 H2 H3', 'Rückfahrposition zwischen den Punkten']] },
+    G78: { t: 'G78 · Zyklus an Polarpunkt', sk: 'polar', p: [['IA JA', 'Pol (I J inkremental)'], ['RP AP', 'Polarradius / Polarwinkel'], ['Z', 'Oberfläche (ohne: aktuelle Position)'], ['AR', 'Drehwinkel']] },
+    G79: { t: 'G79 · Zyklus an einem Punkt', p: [['X Y', 'Bezugspunkt der Geometrie'], ['Z', 'Materialoberfläche (ohne: aktuelle Position)'], ['AR', 'Drehung der Zyklusgeometrie']], n: 'Nach PAL sind alle Adressen optional.' },
     G80: { t: 'G80 · Zyklus löschen', p: [] },
     G81: { t: 'G81 · Bohren', sk: 'drill', p: [['ZI ZA', 'Bohrtiefe ab Oberfläche / absolut'], ['V', 'Sicherheitsabstand über der Oberfläche'], ['W', 'Rückzugsebene absolut'], ['F', 'Vorschub']], n: 'Aufruf mit G79, G76 oder G77.' },
     G82: { t: 'G82 · Tiefbohren mit Spanbruch', sk: 'drill', p: [['ZI ZA', 'Bohrtiefe'], ['D', 'Zustellung'], ['V', 'Sicherheitsabstand über der Oberfläche'], ['W', 'Rückzugsebene absolut'], ['DR DM', 'Reduzierwert / Mindestzustellung'], ['DA', 'Anbohrtiefe'], ['VB', 'Rückzugsbetrag'], ['U', 'Verweilzeit']] },
     G83: { t: 'G83 · Tiefbohren mit Entspanen', sk: 'drill', p: [['ZI ZA', 'Bohrtiefe'], ['D', 'Zustellung'], ['V', 'Sicherheitsabstand über der Oberfläche'], ['W', 'Rückzugsebene absolut'], ['DR DM DA', 'wie G82']] },
-    G84: { t: 'G84 · Gewindebohren', sk: 'drill', p: [['ZI ZA', 'Gewindetiefe'], ['F', 'Steigung in mm/U'], ['V', 'Sicherheitsabstand über der Oberfläche'], ['W', 'Rückzugsebene absolut'], ['M3 M4', 'Rechts- / Linksgewinde']] },
+    G84: { t: 'G84 · Gewindebohren', sk: 'drill', p: [['ZI ZA', 'Gewindetiefe'], ['F', 'Steigung in mm/U'], ['M', 'M3 Rechtsgewinde / M4 Linksgewinde (im Zyklussatz)'], ['V', 'Sicherheitsabstand über der Oberfläche'], ['W', 'Rückzugsebene absolut']] },
     G85: { t: 'G85 · Reiben', sk: 'drill', p: [['ZI ZA', 'Tiefe'], ['E', 'Rückzugsvorschub'], ['V', 'Sicherheitsabstand über der Oberfläche'], ['W', 'Rückzugsebene absolut']] },
     G86: { t: 'G86 · Ausdrehen', sk: 'drill', p: [['ZI ZA', 'Tiefe'], ['V', 'Sicherheitsabstand über der Oberfläche'], ['W', 'Rückzugsebene absolut']] },
     G90: { t: 'G90 · Absolutmaß', p: [], n: 'Alle Koordinaten beziehen sich auf den Werkstücknullpunkt.' },
@@ -2520,24 +2798,26 @@ const CMDHELP = (() => {
   const AX = ['X', 'Y', 'Z', 'XA', 'YA', 'ZA', 'XI', 'YI', 'ZI'];
   const DEPTH = ['ZI', 'ZA'];
   const REQ = {
-    G0: { 'X Y Z': AX }, G1: { 'X Y Z': [...AX, 'D'] },
-    G2: { 'X Y': [...AX, 'AO'], 'I J': ['I', 'J', 'IA', 'JA', 'R', 'AO'] }, G3: { 'X Y': [...AX, 'AO'], 'I J': ['I', 'J', 'IA', 'JA', 'R', 'AO'] },
+    // G0/G1: nach PAL nur optionale Adressen
+    G2: { 'X Y': [...AX, 'AO'] }, G3: { 'X Y': [...AX, 'AO'] },
     G4: { U: ['U'] }, G10: { RP: ['RP'], AP: ['AP', 'AI'] }, G11: { RP: ['RP'], AP: ['AP', 'AI'] },
     G12: { AP: ['AP', 'AI'] }, G13: { AP: ['AP', 'AI'] },
     G22: { L: ['L'] }, G23: { N: ['N'] },
     G41: { 'X Y': ['X', 'Y', 'XA', 'YA', 'XI', 'YI'] }, G42: { 'X Y': ['X', 'Y', 'XA', 'YA', 'XI', 'YI'] },
     G45: { DL: ['DL'] }, G46: { RR: ['RR'] }, G47: { RR: ['RR'] },
     G58: { 'RP AP': ['RP', 'AP', 'ZI', 'ZA', 'WI', 'WA'] },
+    // Pflichtadressen nach PAL (Tabellenbuch); fehlende V/D meldet die Simulation als Fehler, rechnet aber weiter
     G72: { 'LP BP': ['LP', 'BP'], 'ZI ZA': DEPTH, D: ['D'], V: ['V'] },
     G73: { R: ['R'], 'ZI ZA': DEPTH, D: ['D'], V: ['V'] },
     G74: { 'LP BP': ['LP', 'BP'], 'ZI ZA': DEPTH, D: ['D'], V: ['V'] },
-    G75: { BP: ['BP'], RP: ['RP'], AN: ['AN'], 'AO AP': ['AO', 'AP'], 'ZI ZA': DEPTH, D: ['D'], V: ['V'] },
-    G76: { 'X Y Z': AX, AS: ['AS'], D: ['D'], O: ['O'] },
-    G77: { 'IA JA': ['IA', 'JA'], R: ['R'], AN: ['AN'], 'AI AP': ['AI', 'AP'], O: ['O'], Z: ['Z', 'ZA'] },
-    G78: { 'IA JA': ['IA', 'JA', 'I', 'J'], 'RP AP': ['RP', 'AP'], Z: ['Z', 'ZA'] },
-    G79: { 'X Y': ['X', 'Y', 'XA', 'YA'], Z: ['Z', 'ZA'] },
+    G75: { BP: ['BP'], RP: ['RP'], AN: ['AN', 'AP'], 'AO AP': ['AO', 'AP'], 'ZI ZA': DEPTH, D: ['D'], V: ['V'] },
+    G76: { AS: ['AS'], D: ['D'], O: ['O'] },
+    G77: { 'IA JA': ['IA', 'JA', 'I', 'J'], R: ['R'], AN: ['AN'], 'AI AP': ['AI', 'AP'], O: ['O'], Z: ['Z', 'ZA', 'ZI'] },
+    G78: { 'IA JA': ['IA', 'JA', 'I', 'J'], 'RP AP': ['RP', 'AP'] },
+    G87: { 'ZI ZA': DEPTH, R: ['R'], D: ['D'], V: ['V'] },
+    G88: { 'ZI ZA': DEPTH, DN: ['DN'], D: ['D'], Q: ['Q'], V: ['V'] },
     G81: { 'ZI ZA': DEPTH, V: ['V'] }, G82: { 'ZI ZA': DEPTH, D: ['D'], V: ['V'] }, G83: { 'ZI ZA': DEPTH, D: ['D'], V: ['V'] },
-    G84: { 'ZI ZA': DEPTH, F: ['F'], V: ['V'] }, G85: { 'ZI ZA': DEPTH, E: ['E'], V: ['V'] }, G86: { 'ZI ZA': DEPTH, V: ['V'] },
+    G84: { 'ZI ZA': DEPTH, F: ['F'], M: ['M'], V: ['V'] }, G85: { 'ZI ZA': DEPTH, V: ['V'] }, G86: { 'ZI ZA': DEPTH, V: ['V'] },
     G92: { S: ['S'] }, G96: { S: ['S'] }, T: { T: ['T'], M6: ['M'] }, M6: { T: ['T'] }
   };
 
@@ -2559,13 +2839,17 @@ const CMDHELP = (() => {
     T: 'Werkzeugnummer aus der Werkzeugtabelle, eingewechselt mit M6.', TC: 'Korrekturspeicher des Werkzeugs.', TR: 'Korrekturwert für den Werkzeugradius.', TL: 'Korrekturwert für die Werkzeuglänge.',
     H: 'Anzahl (G22, G23), Bearbeitungsart in Zyklen (1, 4, 14) oder Reihenfolge bei G14.', L: 'Nummer des Unterprogramms (G22).', O: 'Anzahl der Punkte (G76, G77) bzw. Anfahrart O1/O2 bei der Radiuskorrektur.',
     U: 'Verweilzeit in Sekunden.', V: 'Sicherheitsabstand über der Materialoberfläche (Zyklen).', W: 'Rückzugsebene absolut (Zyklen).', E: 'Eintauch- bzw. Rückzugsvorschub in Zyklen.',
-    WA: 'Drehwinkel absolut (G58, G59).', WI: 'Drehwinkel inkremental (G58, G59).',
+    WA: 'Drehwinkel absolut (G58, G59) bzw. Stufentiefe (G72–G75, QM2).', WI: 'Drehwinkel inkremental (G58, G59).',
     LP: 'Länge der Tasche bzw. Nut.', BP: 'Breite der Tasche bzw. Nut.', AK: 'Aufmaß am Rand.', AL: 'Aufmaß am Boden.', EP: 'Bezugspunkt der Zyklusgeometrie (0 Mitte, 1 Ecke bzw. Bogenmittelpunkt).',
-    RZ: 'Zapfenradius in der Kreistasche (G73).', Q: 'Art des Bohrbilds bei G76 (Q1 Rahmen, Q2 Gitter) bzw. G77 (Q1 mitdrehen).', DI: 'Abstand in der zweiten Richtung (G76 Gitter).', OI: 'Anzahl in der zweiten Richtung bzw. Anzahl Kreise.',
+    RZ: 'Zapfenradius (G73) bzw. Verrundungsradius des Zapfens (G72).', LZ: 'Länge des zentrischen Zapfens (G72).', BZ: 'Breite des zentrischen Zapfens (G72).',
+    HA: 'Zapfenhöhe absolut (Z der Zapfenoberkante).', HI: 'Zapfenhöhe inkremental ab Taschenboden.', QM: 'Bearbeitungsauswahl: QM1 ohne Stufen, QM2 mit Stufen, QM−1 Fasen.',
+    BA: 'Stufenbreite am Taschenrand (mit QM2).', CB: 'Fasenbreite an den Oberkanten (mit QM−1).', CM: 'Arbeitsbereichsmitte des Faswerkzeugs in Prozent der Schneide.', RM: 'Mindestradius der Schruppbewegungen in % des Fräserdurchmessers.',
+    DN: 'Nenndurchmesser des Innengewindes (G88).', BG: 'Bewegungsrichtung des Fräsers: BG2 im Uhrzeigersinn, BG3 gegen den Uhrzeigersinn (G87, G88).',
+ Q: 'Art des Bohrbilds bei G76 (Q1 Rahmen, Q2 Gitter), G77 (Q1 mitdrehen) bzw. Gewinderillen des Fräsers (G88).', DI: 'Abstand in der zweiten Richtung (G76 Gitter).', OI: 'Anzahl in der zweiten Richtung bzw. Anzahl Kreise.',
     RI: 'Radiusabstand der konzentrischen Kreise (G77).', DA: 'Anbohrtiefe (G82, G83).', DR: 'Reduzierwert der Zustellung (G82, G83).', DM: 'Mindestzustellung (G82, G83).', VB: 'Rückzugsbetrag beim Spanbrechen (G82).',
     '(': 'Kommentar beginnen – alles bis „)“ wird nicht ausgeführt.', ')': 'Kommentar beenden.', ';': 'Kommentar bis zum Zeilenende.', '%': 'Programmkopf, z. B. %100 oder %L10 für ein Unterprogramm.'
   };
-  const PRIO = [72, 73, 74, 75, 81, 82, 83, 84, 85, 86, 76, 77, 78, 79, 41, 42, 40, 45, 46, 47, 0, 1, 2, 3, 10, 11, 12, 13, 4, 14, 22, 23, 58, 59, 66, 54, 55, 56, 57, 53, 50, 92, 96, 97, 95, 94, 18, 19, 17, 90, 91, 9, 80];
+  const PRIO = [72, 73, 74, 75, 81, 82, 83, 84, 85, 86, 87, 88, 15, 16, 76, 77, 78, 79, 41, 42, 40, 45, 46, 47, 0, 1, 2, 3, 10, 11, 12, 13, 4, 14, 22, 23, 58, 59, 66, 54, 55, 56, 57, 53, 50, 92, 96, 97, 95, 94, 18, 19, 17, 90, 91, 9, 80];
   function pick(words) {
     const gs = words.filter(w => w.a === 'G').map(w => w.v);
     for (const g of PRIO) if (gs.includes(g)) {
@@ -2590,12 +2874,16 @@ const CMDHELP = (() => {
   const clone = o => JSON.parse(JSON.stringify(o));
   const PAL_COLORS = ['#e8a33d', '#3d8fe8', '#36b37e', '#d65db1', '#e8603d', '#8a6be8', '#2fb8c9', '#b5a92f'];
   const hex = h => [parseInt(h.slice(1, 3), 16) / 255, parseInt(h.slice(3, 5), 16) / 255, parseInt(h.slice(5, 7), 16) / 255];
-  const toolColor = nr => PAL_COLORS[((nr || 1) - 1 + 800) % 8];
+  const autoColor = nr => PAL_COLORS[((nr || 1) - 1 + 800) % 8];
+  const toolColor = t => (t && typeof t === 'object' ? (/^#[0-9a-f]{6}$/i.test(t.color || '') ? t.color : autoColor(t.nr)) : autoColor(t));
+  const SWATCHES = ['#e8a33d', '#3d8fe8', '#36b37e', '#d65db1', '#e8603d', '#8a6be8', '#2fb8c9', '#b5a92f', '#d64545', '#5c6bc0', '#7cb342', '#8d6e63'];
   const esc = s => String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
   const LH = 26;
   /* Maschinennullpunkt M links vorne auf der Tischoberfläche. Intern rechnet die Simulation mit der Rohteilunterseite
      auf Z 0; MO ist die Lage von M in diesem internen System. Angezeigt und eingegeben wird immer echtes MKS. */
-  const MO = { x: -110, y: -45, z: -12 };
+  const MO = { x: -110, y: -45, z: -12 };            // Rohteilunterseite liegt 12 mm über dem Tisch (Parallelunterlagen), mit Schraubstock 52 mm
+  const VISE_H = 40;                                    // Höhe des Schraubstocks unter den Parallelunterlagen
+  const setMO = () => { MO.z = -(12 + (S && S.machine && S.machine.vise ? VISE_H : 0)); };
   const MO_V3 = { x: 450, y: 260, z: 400 };            // v3: M am Ende der Verfahrwege
   const toInt = p => ({ x: p.x + MO.x, y: p.y + MO.y, z: p.z + MO.z });
   const ST = () => ({ ...S.stock, x0: S.stock.x0 + MO.x, y0: S.stock.y0 + MO.y });
@@ -2609,15 +2897,17 @@ const CMDHELP = (() => {
     let s = null;
     try { s = JSON.parse(localStorage.getItem(STORE_KEY)); } catch (e) { s = null; }
     const d = clone(DEFAULTS);
-    if (!s || !s.tools) return { ...d, ...clone(EXAMPLES[0].setup), code: EXAMPLES[0].code, cur: { id: null, name: EXAMPLES[0].name }, v: 5, ui: { help: true, keys: true } };
+    if (!s || !s.tools) return { ...d, ...clone(EXAMPLES[0].setup), code: EXAMPLES[0].code, cur: { id: null, name: EXAMPLES[0].name }, v: 7, ui: { help: true, keys: true } };
     if (!(s.v >= 2)) { for (const t of d.tools) if (!s.tools.some(x => x.nr === t.nr)) s.tools.push(t); s.v = 2; }
-    if (!(s.v >= 4)) migrateMks(s);
-    if (!(s.v >= 5)) { if (s.machine && (!s.machine.res || s.machine.res === 360)) s.machine.res = 560; s.v = 5; }   // Standard jetzt „fein“
-    return { v: 5,
+    const v0 = s.v || 0;
+    if (!(v0 >= 4)) migrateMks(s); else if (v0 === 6) unshiftVise(s);
+    if (!(v0 >= 5)) { if (s.machine && (!s.machine.res || s.machine.res === 360)) s.machine.res = 560; }   // Standard jetzt „fein“
+    s.v = 7;
+    return { v: 7,
       stock: { ...d.stock, ...s.stock }, zero: { ...d.zero, ...s.zero },
       machine: { ...d.machine, ...s.machine, tcp: { ...d.machine.tcp, ...(s.machine || {}).tcp } },
       tools: s.tools, code: typeof s.code === 'string' ? s.code : EXAMPLES[0].code, cur: s.cur || { id: null, name: '' },
-      showMachine: s.showMachine, showTable: s.showTable, showWks: s.showWks, ui: { help: true, keys: true, ...(s.ui || {}) }
+      showMachine: s.showMachine, showTable: s.showTable, showWks: s.showWks, showChips: s.showChips, showCoolant: s.showCoolant, showColors: s.showColors, sound: s.sound, ui: { help: true, keys: true, ...(s.ui || {}) }
     };
   }
   function migrateMks(s) {
@@ -2628,7 +2918,18 @@ const CMDHELP = (() => {
     if (s.stock) { if (s.stock.x0 !== undefined) s.stock.x0 += d.x; if (s.stock.y0 !== undefined) s.stock.y0 += d.y; }
     if (s.zero) for (const k of Object.keys(s.zero)) sh(s.zero[k]);
     if (s.machine && s.machine.tcp) { const t = s.machine.tcp; t.x = (t.x || 0) + d.x; t.y = (t.y || 0) + d.y; t.z = (t.z || 0) + d.z; }
-    s.v = 4;
+    s.v = 7;
+  }
+  // Nullpunkte in Z verschieben, wenn sich die Rohteilunterseite durch den Schraubstock hebt oder senkt
+  function shiftZero(zero, dz) {
+    if (zero) for (const k of Object.keys(zero)) { const p = zero[k]; if (p && (p.x || p.y || p.z)) p.z = (p.z || 0) + dz; }
+  }
+  // v6 hatte den Schraubstock immer eingebaut (+40 mm); ab v7 ist er abwählbar und standardmäßig aus
+  function unshiftVise(s) {
+    if (s.machine && s.machine.vise !== undefined) return;
+    shiftZero(s.zero, -VISE_H);
+    if (s.machine) s.machine.vise = false;
+    s.v = 7;
   }
   let saveTimer = null;
   function saveState() {
@@ -2784,8 +3085,64 @@ const CMDHELP = (() => {
     }
   });
 
+  /* ---------------- Touch-Scrollen: folgt dem Finger sofort, mit Schwung ---------------- */
+  function touchScroll(E, onTap) {
+    let st = null, moved = false, hist = [], raf = 0;
+    E.addEventListener('touchstart', e => { if (e.touches.length === 1) e.preventDefault(); }, { passive: false });
+    E.addEventListener('pointerdown', e => {
+      if (e.pointerType !== 'touch' || st) return;
+      cancelAnimationFrame(raf);
+      st = { id: e.pointerId, x: e.clientX, y: e.clientY, sx: E.scrollLeft, sy: E.scrollTop };
+      moved = false; hist = [{ t: performance.now(), x: e.clientX, y: e.clientY }];
+    });
+    E.addEventListener('pointermove', e => {
+      if (!st || e.pointerId !== st.id) return;
+      const dx = e.clientX - st.x, dy = e.clientY - st.y;
+      if (!moved && Math.hypot(dx, dy) > 5) moved = true;
+      if (moved) { E.scrollLeft = st.sx - dx; E.scrollTop = st.sy - dy; }
+      hist.push({ t: performance.now(), x: e.clientX, y: e.clientY }); if (hist.length > 8) hist.shift();
+    });
+    const end = e => {
+      if (!st || e.pointerId !== st.id) return;
+      if (!moved) { if (e.type === 'pointerup') onTap(e); }
+      else {
+        const now = performance.now(), h = hist.filter(p => now - p.t < 100);
+        if (h.length > 1) {
+          const a0 = h[0], b0 = h[h.length - 1], dt = Math.max(8, b0.t - a0.t);
+          let vx = (b0.x - a0.x) / dt, vy = (b0.y - a0.y) / dt, last = now;
+          const step = t => {
+            const d = t - last; last = t;
+            E.scrollLeft -= vx * d; E.scrollTop -= vy * d;
+            const f = Math.pow(0.996, d); vx *= f; vy *= f;
+            if (Math.hypot(vx, vy) > 0.03) raf = requestAnimationFrame(step);
+          };
+          raf = requestAnimationFrame(step);
+        }
+      }
+      st = null;
+    };
+    E.addEventListener('pointerup', end); E.addEventListener('pointercancel', end);
+  }
+  const CHW = (() => { const s = document.createElement('span'); s.style.cssText = 'position:absolute;visibility:hidden;white-space:pre;font:16px var(--f-mono)'; s.textContent = 'X'.repeat(40); document.body.appendChild(s); const w = s.getBoundingClientRect().width / 40; s.remove(); return w || 9.6; });
+  let chw = 0;
+  touchScroll(editorEl, e => {
+    // Tippen: Cursor an die angetippte Stelle setzen
+    if (!chw) chw = CHW();
+    const r = ta.getBoundingClientRect(), L = lines();
+    const l = Math.max(0, Math.min(L.length - 1, Math.floor((e.clientY - r.top - 6) / LH)));
+    const c = Math.max(0, Math.min(L[l].length, Math.round((e.clientX - r.left - 14) / chw)));
+    let pos = 0; for (let i = 0; i < l; i++) pos += L[i].length + 1;
+    pos += c;
+    ta.focus({ preventScroll: true }); ta.setSelectionRange(pos, pos); lastEdit = ta;
+    cursorFromEditor();
+  });
+  const tapClick = e => {
+    const t = document.elementFromPoint(e.clientX, e.clientY); if (!t) return;
+    if (/INPUT|TEXTAREA|SELECT/.test(t.tagName)) t.focus(); else t.click();
+  };
+
   /* ---------------- Tastenfeld ---------------- */
-  const ALLG = [0, 1, 2, 3, 4, 9, 10, 11, 12, 13, 14, 17, 18, 19, 22, 23, 40, 41, 42, 45, 46, 47, 50, 53, 54, 55, 56, 57, 58, 59, 66, 72, 73, 74, 75, 76, 77, 78, 79, 80, 81, 82, 83, 84, 85, 86, 90, 91, 92, 94, 95, 96, 97].map(g => 'G' + g);
+  const ALLG = [0, 1, 2, 3, 4, 9, 10, 11, 12, 13, 14, 17, 18, 19, 22, 23, 40, 41, 42, 45, 46, 47, 50, 53, 54, 55, 56, 57, 58, 59, 66, 72, 73, 74, 75, 76, 77, 78, 79, 80, 81, 82, 83, 84, 85, 86, 87, 88, 90, 91, 92, 94, 95, 96, 97].map(g => 'G' + g);
   const ALLM = [0, 1, 3, 4, 5, 6, 8, 9, 13, 14, 15, 17, 30].map(m => 'M' + m);
   const KEYS = {
     g: ['G', 'G0', 'G1', 'G2', 'G3', 'G17', 'G40', 'G41', 'G42', 'G46', 'G47', 'G54', 'G90', 'G91', 'G72', 'G81', 'G79'],
@@ -2795,8 +3152,8 @@ const CMDHELP = (() => {
   };
   const PER = 23;
   const chunk = arr => { const out = []; for (let i = 0; i < arr.length; i += PER) out.push(arr.slice(i, i + PER)); return out; };
-  const NOT_SIM = ['LZ', 'BZ', 'HA', 'HI', 'QM', 'RM', 'BA'];
-  const A_ORDER = ['H', 'XI', 'YI', 'ZI', 'KA', 'L', 'O', 'U', 'E', 'W', 'Q', 'DL', 'RR', 'WV', 'AO', 'AR', 'WA', 'WI', 'TC', 'TR', 'TL', 'LP', 'BP', 'AK', 'AL', 'EP', 'RZ', 'AN', 'RI', 'DI', 'OI', 'DA', 'DR', 'DM', 'VB'];
+  const NOT_SIM = ['AM', 'BM', 'BR', 'CR'];
+  const A_ORDER = ['H', 'XI', 'YI', 'ZI', 'KA', 'L', 'O', 'U', 'E', 'W', 'Q', 'DL', 'RR', 'WV', 'AO', 'AR', 'WA', 'WI', 'TC', 'TR', 'TL', 'LP', 'BP', 'AK', 'AL', 'EP', 'RZ', 'AN', 'RI', 'DI', 'OI', 'DA', 'DR', 'DM', 'VB', 'LZ', 'BZ', 'HA', 'HI', 'QM', 'BA', 'CB', 'CM', 'RM', 'DN', 'BG'];
   const restA = A_ORDER.concat([...PAL.ADDR].filter(x => !['G', 'M'].includes(x) && !KEYS.a.includes(x) && !A_ORDER.includes(x) && !NOT_SIM.includes(x)));
   const PAGES = {
     gm: [[...KEYS.g, ...KEYS.m], ...chunk([...ALLG.filter(g => !KEYS.g.includes(g)), ...ALLM.filter(m => !KEYS.m.includes(m))])],
@@ -2970,6 +3327,17 @@ const CMDHELP = (() => {
   function interpret(rebuildStock = false) {
     SIM.playing = false; SIM.stopAt = null;
     SIM.res = PAL.run(ta.value, cfg());
+    // Passt der Werkstücknullpunkt in Z zum Rohteil? Sonst fräst das Programm in der Luft oder zu tief.
+    {
+      const used = new Set(SIM.res.moves.map(m => m.zp).filter(z => z && z !== 'G53'));
+      const st = ST(), top = st.H - MO.z, bot = -MO.z;
+      for (const g of used) {
+        const z = S.zero[g] && S.zero[g].z; if (typeof z !== 'number') continue;
+        if (Math.abs(z - top) < 0.01 || Math.abs(z - bot) < 0.01) continue;
+        const d = z - top, ln0 = lines().findIndex(l => new RegExp('\\b' + g + '\\b', 'i').test(l.replace(/\(.*?\)|;.*$/g, ''))), ln = ln0 >= 0 ? ln0 : SIM.res.moves.find(m => m.zp === g).line;
+        SIM.res.msgs.unshift({ lvl: 'warn', line: ln, text: `${g} liegt in Z ${num(Math.abs(d))} mm ${d > 0 ? 'über' : 'unter'} der Rohteiloberkante (Nullpunkt Z ${num(z)}, Oberkante Z ${num(top)}). Z0 im Programm ist dann nicht die Oberfläche – das Werkzeug fräst ${d > 0 ? 'in der Luft' : 'zu tief'}. Nullpunkt im Tab „Rohteil / Nullpunkt“ prüfen.` });
+      }
+    }
     SIM.profs = S.tools.map(t => PAL.cutProfile(t));
     const st = ST();
     if (rebuildStock || !stock || stock.L !== st.L || stock.B !== st.B || stock.H !== st.H || stock.x0 !== st.x0 || stock.y0 !== st.y0 || stock.N !== S.machine.res) {
@@ -2985,8 +3353,9 @@ const CMDHELP = (() => {
       const t = S.tools[m.tool]; if (!t || t.type !== 'tap' || m.kind !== 'G1') continue;
       const a0 = m.pts[0], a1 = m.pts[m.pts.length - 1];
       if (Math.hypot(a1.x - a0.x, a1.y - a0.y) > 1e-6 || a1.z >= a0.z) continue;
-      SIM.taps.push({ x: a0.x, y: a0.y, r: t.D / 2, p: m.feedMode === 95 && m.F > 0 ? m.F : 1.25, za: a0.z, zb: a1.z, t0: m.t0, t1: m.t1 });
+      SIM.taps.push({ x: a0.x, y: a0.y, r: t.D / 2, p: (m.feedMode === 95 && m.F > 0 ? m.F : 1.25) * (m.spindle === 'M4' ? -1 : 1), za: a0.z, zb: a1.z, t0: m.t0, t1: m.t1 });
     }
+    for (const th of SIM.res.threads || []) SIM.taps.push({ ...th });
     resetSim();
     GFX.buildPath();
     GFX.toolMeshes = {};
@@ -3018,7 +3387,7 @@ const CMDHELP = (() => {
   function stampRange(m, u0, u1) {
     if (m.tool < 0) return;
     const tl = S.tools[m.tool]; if (!tl) return;
-    const prof = SIM.profs[m.tool], R = tl.D / 2, lc = tl.lc, id = tl.nr;
+    const prof = SIM.profs[m.tool], R = tl.D / 2, lc = tl.lc, id = m.tool + 1;
     const p = m.pts, cl = m.cl, step = SIM.step;
     let k = 0, u = u0, flags = 0;
     while (true) {
@@ -3161,7 +3530,7 @@ const CMDHELP = (() => {
     SIM.playing = false; setStatus('Berechne …');
     setTimeout(() => { seek(SIM.res.total); setStatus('Fertig'); renderMessages(); renderEditor(); renderPlist(); }, 20);
   }
-  function cycleStart() { if (SIM.playing) pause(); else if (SIM.single) stepBlock(); else play(); }
+  function cycleStart() { SND.start(); if (SIM.playing) pause(); else if (SIM.single) stepBlock(); else play(); }
   function setMode(single) {
     SIM.single = single;
     $('mAuto').setAttribute('aria-pressed', String(!single)); $('mSingle').setAttribute('aria-pressed', String(single));
@@ -3261,9 +3630,10 @@ const CMDHELP = (() => {
     drill: '<path d="M8 2h10v19l-5 7-5-7z" fill="currentColor"/>',
     center: '<path d="M7 2h12v14l-6 11-6-11z" fill="currentColor"/>',
     chamfer: '<path d="M10 2h6v13h5l-6 10h-4L5 15h5z" fill="currentColor"/>',
-    tap: '<path d="M9 2h8v24H9z" fill="currentColor"/><path d="M8 10h10M8 14h10M8 18h10M8 22h10" stroke="#fff" stroke-width="1.2"/>'
+    tap: '<path d="M9 2h8v24H9z" fill="currentColor"/><path d="M8 10h10M8 14h10M8 18h10M8 22h10" stroke="#fff" stroke-width="1.2"/>',
+    thread: '<path d="M10 2h6v14h-6z" fill="currentColor"/><path d="M6 16h14v10H6z" fill="currentColor"/><path d="M5 19h16M5 23h16" stroke="#fff" stroke-width="1.3"/>'
   };
-  const TYPE_SHORT = { flat: 'Schaft', face: 'Plan', ball: 'Radius', torus: 'Torus', drill: 'Bohrer', center: 'Anbohrer', chamfer: 'Fase', tap: 'Gewinde' };
+  const TYPE_SHORT = { flat: 'Schaft', face: 'Plan', ball: 'Radius', torus: 'Torus', drill: 'Bohrer', center: 'Anbohrer', chamfer: 'Fase', tap: 'Gewinde', thread: 'Gew.-Fräs.' };
   function rAngle(t) {
     if (t.type === 'ball') return 'R' + fmt(t.D / 2, 1).replace(',0', '');
     if (t.type === 'torus') return 'r' + fmt(t.rc, 1).replace(',0', '');
@@ -3293,7 +3663,7 @@ const CMDHELP = (() => {
       <defs><clipPath id="tsClip"><rect x="0" y="${Y(zc)}" width="${W}" height="${H}"/></clipPath><clipPath id="tsHold"><rect x="0" y="0" width="${W}" height="${Y(zH)}"/></clipPath></defs>
       <path d="${d}Z" fill="#c7ccd3" stroke="#6f7a86"/>
       <path d="${d}Z" fill="#4d5560" clip-path="url(#tsHold)"/>
-      <path d="${d}Z" fill="${toolColor(t.nr)}" stroke="#5b4a3a" stroke-width=".8" clip-path="url(#tsClip)"/>
+      <path d="${d}Z" fill="${toolColor(t)}" stroke="#5b4a3a" stroke-width=".8" clip-path="url(#tsClip)"/>
       <path d="M${cx} ${padT - 6}V${Y(0) + 8}" stroke="#1c232b" stroke-width=".8" stroke-dasharray="5 3"/>
       <path d="M${X(-rD)} ${yDim}H${X(rD)}M${X(-rD)} ${yDim - 6}v12M${X(rD)} ${yDim - 6}v12" stroke="#e8590c" stroke-width="2"/>
       ${lab(cx, yDim + 22, 'Ø ' + fmt(t.D, 1).replace(',0', ''), '#c4470a', 'middle')}
@@ -3311,21 +3681,24 @@ const CMDHELP = (() => {
     table() {
       const tb = $('toolTable').tBodies[0];
       tb.innerHTML = this.D.map((t, i) => `<tr class="${i === this.sel ? 'sel' : ''}" data-i="${i}" tabindex="0" aria-selected="${i === this.sel}">
-        <td class="l tn"><span class="tsw" style="background:${toolColor(t.nr)}"></span>T${t.nr}</td><td class="l ui">${esc(t.name)}</td>
+        <td class="l tn"><span class="tsw" style="background:${toolColor(t)}"></span>T${t.nr}</td><td class="l ui">${esc(t.name)}</td>
         <td>${fmt(t.D, 1)}</td><td>${rAngle(t)}</td><td>${fmt(t.lc, 0)}</td><td>${fmt(t.L, 0)}</td><td>${fmt(t.z, 0)}</td></tr>`).join('') ||
         '<tr><td colspan="7" class="l ui" style="color:var(--muted)">Keine Werkzeuge – mit „Neues Werkzeug“ anlegen.</td></tr>';
       $('toolCount').textContent = `${this.D.length} Werkzeug${this.D.length === 1 ? '' : 'e'}`;
     },
     detail() {
       const t = this.D[this.sel];
-      if (!t) { $('tdTitle').textContent = 'Kein Werkzeug'; $('tdSketch').innerHTML = ''; $('tdTypes').innerHTML = ''; $('tdFields').innerHTML = ''; $('tdHint').innerHTML = ''; return; }
+      if (!t) { $('tdTitle').textContent = 'Kein Werkzeug'; $('tdSketch').innerHTML = ''; $('tdColor').innerHTML = ''; $('tdTypes').innerHTML = ''; $('tdFields').innerHTML = ''; $('tdHint').innerHTML = ''; return; }
       $('tdTitle').textContent = `T${t.nr} · ${t.name}`;
       $('tdState').textContent = this.dirty ? 'geändert – noch nicht übernommen' : 'wird bearbeitet';
       $('tdSketch').innerHTML = toolSketch(t);
-      $('tdTypes').innerHTML = Object.keys(TOOL_TYPES).map(k => `<button class="typ" type="button" data-type="${k}" aria-pressed="${k === t.type}" title="${TOOL_TYPES[k].label}"><svg width="26" height="30" viewBox="0 0 26 30" aria-hidden="true" style="color:${k === t.type ? toolColor(t.nr) : '#8f99a4'}">${TYPE_ICON[k]}</svg>${TYPE_SHORT[k]}</button>`).join('');
+      $('tdTypes').innerHTML = Object.keys(TOOL_TYPES).map(k => `<button class="typ" type="button" data-type="${k}" aria-pressed="${k === t.type}" title="${TOOL_TYPES[k].label}"><svg width="26" height="30" viewBox="0 0 26 30" aria-hidden="true" style="color:${k === t.type ? toolColor(t) : '#8f99a4'}">${TYPE_ICON[k]}</svg>${TYPE_SHORT[k]}</button>`).join('');
       const fld = (k, lbl, unit, val, type = 'number', extra = '') => `<label class="fld"${extra}><span class="lbl">${lbl}</span><span class="field"><input data-k="${k}" type="${type}" ${type === 'number' ? 'step="any" min="0" inputmode="none"' : ''} value="${esc(val)}">${unit ? `<em>${unit}</em>` : ''}</span></label>`;
       $('tdFields').innerHTML = fld('nr', 'T-Nummer', '', t.nr) + fld('name', 'Bezeichnung', '', t.name, 'text') +
         TOOL_TYPES[t.type].fields.map(f => fld(f, FIELD[f][0], FIELD[f][1], t[f])).join('');
+      $('tdColor').innerHTML = `<div class="fld"><span class="lbl">Farbe in der Simulation</span><div class="colrow">` +
+        SWATCHES.map(c => `<button type="button" class="csw" data-col="${c}" style="background:${c}" aria-label="Farbe ${c}" aria-pressed="${toolColor(t).toLowerCase() === c}"></button>`).join('') +
+        `</div></div>`;
       this.hint();
     },
     hint(msg) {
@@ -3343,6 +3716,7 @@ const CMDHELP = (() => {
       else if (t.type === 'drill') txt = 'Spitzenwinkel meist 118°. Die Bohrtiefe im Zyklus bezieht sich auf die Bohrerspitze.';
       else if (t.type === 'center') txt = 'NC-Anbohrer mit 90° Spitzenwinkel zentriert und fast zugleich an (Bohrungsdurchmesser + Fase).';
       else if (t.type === 'tap') txt = 'Gewindebohren mit G84; F ist dort die Steigung in mm/U (M8: F1.25). Vorher mit Ø6,8 vorbohren.';
+      else if (t.type === 'thread') txt = 'Gewindefräsen mit G88: Steigung D und Anzahl der Gewinderillen Q stehen im Zyklus. Ø D muss kleiner als das Kernloch sein.';
       else txt = 'Die Schneidenlänge begrenzt die Zustelltiefe. Taucht der Schaft ins Material, meldet die Simulation eine Kollision.';
       const h = $('tdHint');
       h.className = 'hintbox' + (warn ? ' warn' : '');
@@ -3392,6 +3766,11 @@ const CMDHELP = (() => {
     if (e.target.dataset.k !== 'nr') return;
     const t = TOOLED.D[TOOLED.sel]; if (!t) return;
     e.target.value = t.nr; e.target.closest('.field').classList.remove('bad'); TOOLED.hint();
+  });
+  $('tdColor').addEventListener('click', e => {
+    const b = e.target.closest('[data-col]'); if (!b) return;
+    const t = TOOLED.D[TOOLED.sel]; if (!t) return;
+    t.color = b.dataset.col; TOOLED.change(); TOOLED.table(); TOOLED.render();
   });
   $('tdFields').addEventListener('input', e => {
     const k = e.target.dataset.k; if (!k) return;
@@ -3476,6 +3855,10 @@ const CMDHELP = (() => {
       for (const a of ['x', 'y', 'z']) { const el = $('mTcp' + a.toUpperCase()); if (document.activeElement !== el) el.value = D.machine.tcp[a]; }
       $('mRes').value = String(D.machine.res);
       for (const b of $$('#matPills [data-mat]')) b.setAttribute('aria-pressed', String(b.dataset.mat === (D.stock.mat || 'alu')));
+      for (const b of $$('#clampPills [data-vise]')) b.setAttribute('aria-pressed', String((b.dataset.vise === '1') === !!D.machine.vise));
+      const zb = 12 + (D.machine.vise ? VISE_H : 0);
+      $('stockNote').textContent = (D.machine.vise ? `Das Rohteil ist im Schraubstock (${VISE_H} mm hoch) auf 12 mm Parallelunterlagen gespannt` : 'Das Rohteil liegt auf 12 mm hohen Parallelunterlagen auf dem Tisch') +
+        `, seine Unterseite also bei Z ${num(zb)}. Lage = linke vordere untere Ecke in Maschinenkoordinaten. M liegt links vorne auf der Tischoberfläche.`;
       this.table(); this.svg(); updateSetupKeys();
     },
     table() {
@@ -3493,7 +3876,7 @@ const CMDHELP = (() => {
       $('zpNote').textContent = `Werte in Maschinenkoordinaten. M liegt links vorne auf der Tischoberfläche. ` +
         (parts.length ? `W von ${this.target} liegt ${parts.join(', ').replace(/, ([^,]*)$/, ' und $1')} M.` : `${this.target} liegt genau auf M.`);
     },
-    ptCoords(k) { const s = this.D.stock, p = PTS[k]; return { x: s.x0 + p.fx * s.L, y: s.y0 + p.fy * s.B, z: p.fz * s.H - MO.z }; },
+    ptCoords(k) { const s = this.D.stock, p = PTS[k]; return { x: s.x0 + p.fx * s.L, y: s.y0 + p.fy * s.B, z: p.fz * s.H + 12 + (this.D.machine.vise ? VISE_H : 0) }; },
     selected() {
       const z = this.D.zero[this.target];
       for (const k of Object.keys(PTS)) { const c = this.ptCoords(k); if (Math.abs(c.x - z.x) < 1e-6 && Math.abs(c.y - z.y) < 1e-6 && Math.abs(c.z - z.z) < 1e-6) return k; }
@@ -3550,9 +3933,11 @@ const CMDHELP = (() => {
     change() { this.dirty = true; updateSetupKeys(); },
     apply() {
       if (!this.dirty) return;
-      const resCh = this.D.machine.res !== S.machine.res;
-      const stCh = JSON.stringify(this.D.stock) !== JSON.stringify(S.stock);
+      const viseCh = !!this.D.machine.vise !== !!S.machine.vise;
+      const resCh = this.D.machine.res !== S.machine.res || viseCh;
+      const stCh = JSON.stringify(this.D.stock) !== JSON.stringify(S.stock) || viseCh;
       S.stock = clone(this.D.stock); S.zero = clone(this.D.zero); S.machine = clone(this.D.machine);
+      setMO();
       this.dirty = false; saveState(); applyMat(); interpret(resCh); if (stCh) GFX.fit(true); this.render();
     },
     cancel() { this.dirty = false; this.enter(); }
@@ -3589,7 +3974,13 @@ const CMDHELP = (() => {
   $('extraPills').addEventListener('click', e => { const b = e.target.closest('[data-pt]'); if (b) STOCKED.pick(b.dataset.pt); });
   $('cornerSvg').addEventListener('click', e => { const g = e.target.closest('[data-pt]'); if (g) STOCKED.pick(g.dataset.pt); });
   $('cornerSvg').addEventListener('keydown', e => { const g = e.target.closest('[data-pt]'); if (g && (e.key === 'Enter' || e.key === ' ')) { e.preventDefault(); STOCKED.pick(g.dataset.pt); } });
-  $('stockNote').textContent = `Das Rohteil liegt auf ${num(-MO.z)} mm hohen Parallelunterlagen, seine Unterseite also bei Z ${num(-MO.z)}. Lage = linke vordere untere Ecke in Maschinenkoordinaten. M liegt links vorne auf der Tischoberfläche.`;
+  $('clampPills').addEventListener('click', e => {
+    const b = e.target.closest('[data-vise]'); if (!b) return;
+    const v = b.dataset.vise === '1'; if (v === !!STOCKED.D.machine.vise) return;
+    STOCKED.D.machine.vise = v;
+    shiftZero(STOCKED.D.zero, v ? VISE_H : -VISE_H);          // Nullpunkte bleiben auf dem Rohteil
+    STOCKED.change(); STOCKED.render();
+  });
   function applyMat() {
     document.documentElement.style.setProperty('--stock', MATS[S.stock.mat || 'alu'][1]);
     if (GFX.readTheme) GFX.readTheme();
@@ -3656,7 +4047,7 @@ const CMDHELP = (() => {
   function libSave(asCopy) {
     const name = (S.cur.name || '').trim() || progName();
     let e = asCopy ? null : libEntry();
-    const data = { name, code: ta.value, tools: clone(S.tools), stock: clone(S.stock), zero: clone(S.zero), machine: clone(S.machine), v: 4, saved: Date.now() };
+    const data = { name, code: ta.value, tools: clone(S.tools), stock: clone(S.stock), zero: clone(S.zero), machine: clone(S.machine), v: 7, saved: Date.now() };
     if (e) Object.assign(e, data);
     else { e = { id: 'p' + Date.now().toString(36) + Math.random().toString(36).slice(2, 6), ...data }; LIB.push(e); }
     if (!saveLib()) { fileMsg('Speichern im Browser fehlgeschlagen – vermutlich ist der Speicher voll.'); return; }
@@ -3701,13 +4092,15 @@ const CMDHELP = (() => {
     if (!Array.isArray(d.tools)) throw new Error('keine Werkzeugtabelle enthalten');
     if (typeof d.v === 'number' && d.v < 4) migrateMks(d);
     else if (d.v === undefined && d.app === 'pal-fraessimulator') migrateMks(d);
+    else if (d.v === 6) unshiftVise(d);
     const def = clone(DEFAULTS);
     S.tools = d.tools; S.stock = { ...def.stock, ...d.stock }; S.zero = { ...def.zero, ...d.zero };
     S.machine = { ...def.machine, ...d.machine, tcp: { ...def.machine.tcp, ...(d.machine || {}).tcp } };
+    setMO();
     TOOLED.dirty = STOCKED.dirty = false; saveState(); applyMat();
   }
   function projectData() {
-    return JSON.stringify({ app: 'pal-fraessimulator', v: 4, typ: 'projekt', name: curName(), code: ta.value, tools: S.tools, stock: S.stock, zero: S.zero, machine: S.machine }, null, 2);
+    return JSON.stringify({ app: 'pal-fraessimulator', v: 7, typ: 'projekt', name: curName(), code: ta.value, tools: S.tools, stock: S.stock, zero: S.zero, machine: S.machine }, null, 2);
   }
   function saveProject() {
     const name = fileName().replace(/\.nc$/, '') + '_projekt.json';
@@ -3750,14 +4143,14 @@ const CMDHELP = (() => {
     if (m && SIM.T < m.t1 - 1e-9 && (SIM.T > 0 || SIM.playing)) { const e = PAL.toWks(m.frame, m.pts[m.pts.length - 1]); rw = { x: e.x - w.x, y: e.y - w.y, z: e.z - w.z }; }
     $('rwX').textContent = fmt(rw.x); $('rwY').textContent = fmt(rw.y); $('rwZ').textContent = fmt(rw.z);
     $('droM').textContent = `X ${fmt(p.x - MO.x)}  Y ${fmt(p.y - MO.y)}  Z ${fmt(p.z - MO.z)}`;
-    const zpTxt = m ? (m.zp === 'G53' ? 'Maschine G53' : 'Werkstück ' + m.zp) + (m.frame && m.frame.shifted ? ' + G59' + (m.frame.phi ? ` ∠${fmt(m.frame.phi, 1)}°` : '') : '') + (m.frame && (m.frame.mx < 0 || m.frame.my < 0) ? ' · G66' : '') : 'Maschine G53';
+    const zpTxt = m ? (m.zp === 'G53' ? 'Maschine G53' : 'Werkstück ' + m.zp) + (m.frame && m.frame.moved ? ' + G59' + (m.frame.phi ? ` ∠${fmt(m.frame.phi, 1)}°` : '') : '') + (m.frame && (m.frame.mx < 0 || m.frame.my < 0) ? ' · G66' : '') : 'Maschine G53';
     $('droZp').textContent = zpTxt;
     const tool = cs.tool >= 0 ? S.tools[cs.tool] : null;
     if (m) {
       const rapid = m.kind === 'G0' || m.kind === 'WZW';
       const kind = m.kind === 'WZW' ? 'G0' : (m.gmot !== null && m.gmot !== undefined && m.gmot >= 10 ? 'G' + m.gmot : m.kind);
       const n = m.n, vf = rapid ? S.machine.rapid : m.vf;
-      $('techT').innerHTML = tool ? `<b class="mono" style="color:${toolColor(tool.nr)}">T${tool.nr}</b> ${esc(tool.name)} · Ø${fmt(tool.D, 1).replace(',0', '')}${tool.z ? ' · z = ' + tool.z : ''}` : 'kein Werkzeug eingewechselt';
+      $('techT').innerHTML = tool ? `<b class="mono" style="color:${toolColor(tool)}">T${tool.nr}</b> ${esc(tool.name)} · Ø${fmt(tool.D, 1).replace(',0', '')}${tool.z ? ' · z = ' + tool.z : ''}` : 'kein Werkzeug eingewechselt';
       $('techS').textContent = `${fmt(n, 0)} 1/min`;
       $('barS').style.width = Math.min(100, n / S.machine.maxRpm * 100) + '%';
       $('techSd').textContent = m.spindle === 'M5' ? 'M5 steht' : m.spindle === 'M3' ? 'M3 ↻' : 'M4 ↺';
@@ -3868,7 +4261,8 @@ const CMDHELP = (() => {
         const k = (j * nx + i) * 2, z = h[k], t = Math.round(h[k + 1]);
         const p = ((ny - 1 - j) * nx + i) * 4;
         if (z <= 0.015) { data[p + 3] = 0; continue; }
-        const base = t > 0 ? raw.map((v, q) => v * 0.5 + pal[(t - 1) % 8][q] * 0.5) : raw;
+        const tc = t > 0 && S.tools[t - 1] ? hex(toolColor(S.tools[t - 1])) : null;
+        const base = tc ? raw.map((v, q) => v * 0.5 + tc[q] * 0.5) : raw;
         const zl = h[(j * nx + Math.max(0, i - 1)) * 2], zr = h[(j * nx + Math.min(nx - 1, i + 1)) * 2];
         const zd = h[(Math.max(0, j - 1) * nx + i) * 2], zu = h[(Math.min(ny - 1, j + 1) * nx + i) * 2];
         const gx = (zr - zl) / (2 * stock.cx), gy = (zu - zd) / (2 * stock.cy), nl = Math.hypot(gx, gy, 1);
@@ -3916,14 +4310,14 @@ const CMDHELP = (() => {
         const w = ctx.measureText(label).width + 8;
         ctx.fillRect(X(x) - w - 2, Y(y) + 2, w, 16); ctx.fillStyle = '#fff'; ctx.fillText(label, X(x) - w + 2, Y(y) + 14);
       };
-      axes(MO.x, MO.y, 'M', '#4a5563');
-      if (cs.m && cs.m.frame && (cs.m.zp !== 'G53' || cs.m.frame.shifted)) axes(cs.m.frame.ox, cs.m.frame.oy, 'W', cols.accent, cs.m.frame);
+      if (GFX.showWks !== false) axes(MO.x, MO.y, 'M', '#4a5563');
+      if (GFX.showWks !== false && cs.m && cs.m.frame && (cs.m.zp !== 'G53' || cs.m.frame.shifted)) axes(cs.m.frame.ox, cs.m.frame.oy, 'W', cols.accent, cs.m.frame);
       const p = cs.pos, tool = cs.tool >= 0 ? S.tools[cs.tool] : null, r = tool ? Math.max(tool.D / 2 * view.s, 3) : 6;
       const inMat = p.z < s.H;
       ctx.lineWidth = 2;
       ctx.setLineDash(inMat ? [] : [4, 3]);
-      ctx.fillStyle = tool ? toolColor(tool.nr) + (inMat ? '99' : '40') : 'rgba(90,96,104,.4)';
-      ctx.strokeStyle = tool ? toolColor(tool.nr) : cols.muted;
+      ctx.fillStyle = tool ? toolColor(tool) + (inMat ? '99' : '40') : 'rgba(90,96,104,.4)';
+      ctx.strokeStyle = tool ? toolColor(tool) : cols.muted;
       ctx.beginPath(); ctx.arc(X(p.x), Y(p.y), r, 0, Math.PI * 2); ctx.fill(); ctx.stroke(); ctx.setLineDash([]);
       ctx.lineWidth = 1; ctx.strokeStyle = cols.ink;
       ctx.beginPath(); ctx.moveTo(X(p.x) - 5, Y(p.y)); ctx.lineTo(X(p.x) + 5, Y(p.y)); ctx.moveTo(X(p.x), Y(p.y) - 5); ctx.lineTo(X(p.x), Y(p.y) + 5); ctx.stroke();
@@ -4007,7 +4401,7 @@ const CMDHELP = (() => {
       precision highp float;
       in vec3 vPos; flat in float vTool; in float vH; in vec3 vN;
       uniform vec2 uO; uniform vec2 uC; uniform highp ivec2 uN;
-      uniform vec3 uEye; uniform vec3 uRaw; uniform vec3 uPal[8]; uniform float uBot; uniform float uFloor;
+      uniform vec3 uEye; uniform vec3 uRaw; uniform vec3 uPal[24]; uniform float uBot; uniform float uFloor; uniform float uCols;
       uniform vec3 uShift; uniform vec4 uHole[24]; uniform vec2 uHoleZ[24]; uniform int uHoleN; uniform float uTop;
       out vec4 o;
       void main(){
@@ -4025,7 +4419,7 @@ const CMDHELP = (() => {
         }
         vec3 base = uRaw;
         int ti = int(vTool+0.5);
-        if(ti>0 && uFloor < 0.5) base = mix(uRaw, uPal[(ti-1)%8], 0.5);
+        if(ti>0 && uFloor < 0.5) base = uCols > 0.5 ? mix(uRaw, uPal[(ti-1)%24], 0.5) : uRaw*0.9;
         vec3 L1 = normalize(vec3(0.35,-0.55,0.9)), L2 = normalize(vec3(-0.6,0.45,0.35));
         float d = max(dot(n,L1),0.0)*0.72 + max(dot(n,L2),0.0)*0.22;
         float amb = 0.26 + 0.1*n.z;
@@ -4038,7 +4432,7 @@ const CMDHELP = (() => {
           vec4 h = uHole[k]; vec2 hz = uHoleZ[k];
           vec2 dv = q.xy - h.xy; float rr = length(dv);
           if (rr > h.z * 0.7 && rr < h.z * 1.18 && q.z >= hz.x - 0.05 && q.z <= min(hz.y, uTop) + 0.02) {
-            float ph = (q.z + atan(dv.y, dv.x) / 6.2831853 * h.w) / h.w;
+            float ph = (q.z - atan(dv.y, dv.x) / 6.2831853 * h.w) / abs(h.w);
             float tri = abs(fract(ph) - 0.5) * 2.0;
             float ridge = smoothstep(0.15, 0.85, tri);
             base *= mix(0.55, 1.18, ridge);
@@ -4163,6 +4557,7 @@ const CMDHELP = (() => {
       const s = ST(), g = { p: [], n: [], c: [] };
       // Tisch fest: linke vordere Ecke der Oberfläche = Maschinennullpunkt M; wächst nur bei großen Rohteilen mit
       const tx0 = MO.x, ty0 = MO.y, tx1 = Math.max(MO.x + 420, s.x0 + s.L + 40), ty1 = Math.max(MO.y + 230, s.y0 + s.B + 35);
+      GFX.tableRect = { x0: tx0, y0: ty0, x1: tx1, y1: ty1, z: MO.z };
       const tW = tx1 - tx0, tD = ty1 - ty0, sx = (tx0 + tx1) / 2, sy = (ty0 + ty1) / 2;
       const tz = MO.z, TABLE = [0.36, 0.39, 0.43], SLOT = [0.2, 0.22, 0.25], PAR = [0.55, 0.58, 0.62];
       // Maschinentisch mit T-Nuten
@@ -4171,10 +4566,35 @@ const CMDHELP = (() => {
         const y = ty0 + tD * k / 5;
         boxGeo(g, tx0, y - 4, tz - 0.4, tx1, y + 4, tz + 0.02, SLOT);
       }
-      // Parallelunterlagen
+      // Maschinenschraubstock: Grundkörper auf dem Tisch, Spannbacken klemmen das Rohteil in Y
+      const vise = !!S.machine.vise;
+      const VZ = vise ? tz + VISE_H : tz, VC = [0.24, 0.37, 0.52], STEEL = [0.68, 0.71, 0.75], BLK = [0.16, 0.17, 0.19];
+      if (vise) {
+        const jz = Math.max(3, Math.min(s.H - 3, s.H * 0.5));       // Oberkante der Backen (Rohteil ragt heraus)
+        const jx0 = s.x0 - 8, jx1 = s.x0 + s.L + 8, bx0 = jx0 - 10, bx1 = jx1 + 10, cxv = (s.x0 + s.x0 + s.L) / 2;
+        const yf = s.y0, yb = s.y0 + s.B, yFront = yf - 60, yBack = yb + 34;
+        boxGeo(g, bx0, yFront, tz, bx1, yBack, VZ - 4, VC);                                   // Grundkörper
+        boxGeo(g, bx0 + 3, yFront, VZ - 4, bx1 - 3, yBack, VZ, STEEL);                        // geschliffene Führungsbahn
+        boxGeo(g, bx0, yb + 6, VZ, bx1, yBack, jz, VC);                                       // feste Backe
+        boxGeo(g, jx0, yb, VZ, jx1, yb + 6, jz, STEEL);                                       // Backenplatte fest
+        boxGeo(g, bx0, yf - 34, VZ, bx1, yf - 6, jz, VC);                                     // bewegliche Backe
+        boxGeo(g, jx0, yf - 6, VZ, jx1, yf, jz, STEEL);                                       // Backenplatte beweglich
+        // Spindel mit Vierkant und nach unten hängendem Hebel
+        const zc = (tz + VZ) / 2 + 4, yk = yFront - 30;
+        cylGeo(g, cxv, zc, yFront - 22, yFront, 9, STEEL, 20, 'y');
+        boxGeo(g, cxv - 12, yFront - 34, zc - 12, cxv + 12, yFront - 22, zc + 12, BLK);         // Vierkant
+        const overTable = yk > GFX.tableRect.y0 - 2;
+        const down = overTable ? Math.max(8, zc - tz - 6) : 75;
+        boxGeo(g, cxv - 6, yk - 4, zc - down, cxv + 6, yk + 4, zc + 8, BLK);                   // Hebel
+        cylGeo(g, cxv, zc - down + 4, yk - 30, yk - 4, 7, BLK, 16, 'y');                      // Griff
+        GFX.viseTops = [[bx0, yFront, bx1, yBack, VZ], [bx0, yb, bx1, yBack, jz], [bx0, yf - 34, bx1, yf, jz]];
+      }
+      // Parallelunterlagen im Schraubstock
       const pw = Math.min(10, s.B / 6);
-      boxGeo(g, s.x0 + 2, s.y0 + 3, tz, s.x0 + s.L - 2, s.y0 + 3 + pw, -0.02, PAR);
-      boxGeo(g, s.x0 + 2, s.y0 + s.B - 3 - pw, tz, s.x0 + s.L - 2, s.y0 + s.B - 3, -0.02, PAR);
+      boxGeo(g, s.x0 + 2, s.y0 + 1, VZ, s.x0 + s.L - 2, s.y0 + 1 + pw, -0.02, PAR);
+      boxGeo(g, s.x0 + 2, s.y0 + s.B - 1 - pw, VZ, s.x0 + s.L - 2, s.y0 + s.B - 1, -0.02, PAR);
+      // Auflageflächen für herabfallende Späne
+      GFX.viseTops = vise ? GFX.viseTops : [];
       fixture = makeMesh(g.p, g.n, g.c);
 
       // ---- offene Kreuztisch-Fräsmaschine ----
@@ -4186,11 +4606,12 @@ const CMDHELP = (() => {
       const zFoot = Math.min(zT - 46 - 110 - 60, -(colTop + 70) * 0.82);   // Tisch etwa auf Hüfthöhe
       // Sattel (Y-Schlitten): fährt in Y mit dem Tisch
       const gs = { p: [], n: [], c: [] };
-      boxGeo(gs, sx - tW * 0.3, ty0 + 10, zT - 46, sx + tW * 0.3, ty1 - 10, zT - 6, CAST);
-      boxGeo(gs, sx - tW * 0.3 - 1, ty0 + 30, zT - 6, sx + tW * 0.3 + 1, ty0 + 52, zT, RAIL);
-      boxGeo(gs, sx - tW * 0.3 - 1, ty1 - 52, zT - 6, sx + tW * 0.3 + 1, ty1 - 30, zT, RAIL);
-      boxGeo(gs, sx - 8, ty0 - 12, zT - 32, sx + 8, ty0 + 10, zT - 20, CAST);                          // Handrad Y: Welle
-      cylGeo(gs, sx, zT - 26, ty0 - 26, ty0 - 12, 45, DARK, 32, 'y');                                   // Handrad Y
+      const sw = tW * 0.3;
+      boxGeo(gs, sx - sw, ty0 + 14, zT - 46, sx + sw, ty1 - 14, zT - 8, CAST);                          // Sattel
+      boxGeo(gs, sx - sw + 6, ty0 + 10, zT - 40, sx + sw - 6, ty1 - 10, zT - 14, CAST);                 // Sattel, abgesetzte Kante
+      boxGeo(gs, sx - sw - 1, ty0 + 30, zT - 8, sx + sw + 1, ty0 + 52, zT, RAIL);                       // X-Führungen
+      boxGeo(gs, sx - sw - 1, ty1 - 52, zT - 8, sx + sw + 1, ty1 - 30, zT, RAIL);
+      boxGeo(gs, sx - sw + 20, ty0 + 9, zT - 34, sx + sw - 20, ty0 + 11, zT - 20, ACC);                 // Zierstreifen
       // Bett und Ständer: fest
       const gb = { p: [], n: [], c: [] };
       const bed0 = sy - tD * 0.95, bedX = Math.max(tW * 0.42, colW / 2 + 20);
@@ -4199,11 +4620,30 @@ const CMDHELP = (() => {
       boxGeo(gb, sx - bedX + 9, bed0 + 9, zT - 46 - 175, sx + bedX - 9, bed0 + 14, zT - 46 - 160, ACC);     // Zierstreifen vorn
       boxGeo(gb, sx - bedX - 30, bed0 - 30, zFoot, sx + bedX + 30, colFront + colD + 30, zFoot + 60, [0.18, 0.19, 0.21]); // Fuß / Spänewanne
       boxGeo(gb, sx - bedX - 30, bed0 - 30, zFoot + 60, sx + bedX + 30, bed0 - 22, zFoot + 90, [0.18, 0.19, 0.21]);
-      for (const rx of [-1, 1]) boxGeo(gb, sx + rx * tW * 0.22 - 18, bed0 + 10, zT - 56, sx + rx * tW * 0.22 + 18, colFront - 4, zT - 46, RAIL); // Y-Führungen
       boxGeo(gb, sx - colW / 2, colFront, zFoot + 60, sx + colW / 2, colFront + colD, colTop, PAINT);   // Ständer
       boxGeo(gb, sx - colW / 2 - 1, colFront + colD * 0.45, colTop - 70, sx + colW / 2 + 1, colFront + colD * 0.55, colTop - 40, ACC); // Zierstreifen
       for (const rx of [-1, 1]) boxGeo(gb, sx + rx * colW * 0.3 - 16, colFront - 10, zT, sx + rx * colW * 0.3 + 16, colFront, colTop - 30, RAIL); // Z-Führungen
-      cylGeo(gb, sx, colFront + colD / 2, colTop, colTop + 70, Math.min(70, colW * 0.28), DARK);        // Z-Motor
+      // Faltenbalg zwischen den Z-Führungen
+      for (let z = zT; z < colTop - 40; z += 16) {
+        boxGeo(gb, sx - colW * 0.3 + 18, colFront - 8, z, sx + colW * 0.3 - 18, colFront - 1, z + 8, [0.2, 0.21, 0.23]);
+        boxGeo(gb, sx - colW * 0.3 + 18, colFront - 4, z + 8, sx + colW * 0.3 - 18, colFront - 1, z + 16, [0.28, 0.3, 0.33]);
+      }
+      // Faltenbälge über den Y-Führungen (vor und hinter dem Sattelbereich)
+      for (const rx of [-1, 1]) for (let y = bed0 + 10; y < colFront - 6; y += 14) {
+        const x0 = sx + rx * tW * 0.22 - 24, x1 = sx + rx * tW * 0.22 + 24;
+        boxGeo(gb, x0, y, zT - 56, x1, Math.min(y + 7, colFront - 4), zT - 47, [0.22, 0.23, 0.25]);
+      }
+      // Ständerkopf mit abgesetzter Haube
+      boxGeo(gb, sx - colW / 2 + 12, colFront + 12, colTop, sx + colW / 2 - 12, colFront + colD - 12, colTop + 18, CAST);
+      cylGeo(gb, sx, colFront + colD / 2, colTop + 18, colTop + 80, Math.min(66, colW * 0.26), DARK);        // Z-Motor
+      cylGeo(gb, sx, colFront + colD / 2, colTop + 80, colTop + 92, Math.min(46, colW * 0.18), CAST);
+      // Signalleuchte
+      const lx = sx + colW / 2 - 34, ly = colFront + 34;
+      cylGeo(gb, lx, ly, colTop, colTop + 60, 5, RAIL);
+      [[0.15, 0.7, 0.3], [0.95, 0.75, 0.15], [0.85, 0.15, 0.15]].forEach((c, k) => cylGeo(gb, lx, ly, colTop + 60 + k * 22, colTop + 80 + k * 22, 15, c));
+      cylGeo(gb, lx, ly, colTop + 126, colTop + 132, 15, DARK);
+      // Seitliche Spänebleche
+      for (const rx of [-1, 1]) boxGeo(gb, sx + rx * (bedX + 26) - 4, bed0 - 30, zFoot + 60, sx + rx * (bedX + 26) + 4, colFront, zFoot + 140, [0.18, 0.19, 0.21]);
       // Bedienpult am Schwenkarm (rechts vorne)
       const px = sx + bedX + 160, py = sy - tD * 0.55, pz = 260;
       boxGeo(gb, sx + colW / 2, colFront + 40, pz + 330, px + 20, colFront + 80, pz + 360, CAST);       // Arm quer
@@ -4216,11 +4656,21 @@ const CMDHELP = (() => {
       cylGeo(gb, px + 105, pz + 20, py - 52, py - 32, 22, [0.85, 0.1, 0.12], 28, 'y');                  // Not-Halt
       // Spindelkopf: fährt in Z, Spindelnase bei z = 0
       const gh = { p: [], n: [], c: [] };
-      cylGeo(gh, sx, sy, 0, 50, 34, RAIL);                                                                // Spindelnase
-      boxGeo(gh, sx - 95, sy - 95, 50, sx + 95, colFront - 10, 300, PAINT);                              // Spindelkasten
-      boxGeo(gh, sx - 96, sy - 96, 150, sx + 96, sy - 90, 172, ACC);                                    // Zierstreifen
-      cylGeo(gh, sx, sy + 20, 300, 430, 62, DARK);                                                       // Spindelmotor
-      boxGeo(gh, sx - 40, sy + 150, 300, sx + 40, colFront - 10, 340, CAST);
+      cylGeo(gh, sx, sy, 0, 38, 32, RAIL, 48);                                                            // Spindelnase
+      cylGeo(gh, sx, sy, 38, 56, 46, DARK, 48);                                                           // Spindelring
+      boxGeo(gh, sx - 95, sy - 95, 56, sx + 95, colFront - 10, 300, PAINT);                              // Spindelkasten
+      boxGeo(gh, sx - 96, sy - 96, 150, sx + 96, sy - 90, 168, ACC);                                    // Zierstreifen
+      boxGeo(gh, sx - 70, sy - 97, 190, sx + 70, sy - 95, 270, [0.78, 0.8, 0.82]);                      // Frontblende
+      boxGeo(gh, sx - 97, sy - 70, 70, sx - 95, colFront - 30, 130, [0.78, 0.8, 0.82]);                 // Seitenblenden
+      boxGeo(gh, sx + 95, sy - 70, 70, sx + 97, colFront - 30, 130, [0.78, 0.8, 0.82]);
+      boxGeo(gh, sx - 80, sy - 80, 300, sx + 80, colFront - 10, 318, CAST);                              // Deckel
+      cylGeo(gh, sx, sy + 20, 318, 440, 58, DARK, 48);                                                   // Spindelmotor
+      cylGeo(gh, sx, sy + 20, 440, 452, 40, CAST, 48);
+      // Kühlmittelschlauch (Gliederschlauch) mit Düse, zielt auf die Werkzeugschneide
+      for (let k = 0; k <= 14; k++) {
+        const u = k / 14, bx = 62 - 34 * u * u, by = -64 + 36 * u * u, bz = 62 - 50 * u;
+        cylGeo(gh, sx + bx, sy + by, bz - 3, bz + 3, k === 14 ? 4 : 6.5, k % 2 ? [0.16, 0.42, 0.8] : [0.22, 0.5, 0.88], 14);
+      }
       GFX.mach = {
         sx, sy, colFront,
         bed: makeMesh(gb.p, gb.n, gb.c), saddle: makeMesh(gs.p, gs.n, gs.c), head: makeMesh(gh.p, gh.n, gh.c),
@@ -4229,10 +4679,10 @@ const CMDHELP = (() => {
     };
     function toolMesh(idx) {
       const t = S.tools[idx]; if (!t) return null;
-      const key = idx + JSON.stringify(t);
+      const key = idx + JSON.stringify(t) + (GFX.showColors === false ? 'n' : 'c');
       if (GFX.toolMeshes[key]) return GFX.toolMeshes[key];
       const P = PAL.toolOutline(t), seg = 40, pos = [], nor = [], col = [];
-      const cc = hex(toolColor(t.nr)), steel = [0.72, 0.75, 0.79], holder = [0.25, 0.27, 0.3];
+      const steel = [0.72, 0.75, 0.79], holder = [0.25, 0.27, 0.3], cc = GFX.showColors === false ? [0.6, 0.63, 0.67] : hex(toolColor(t));
       for (let i = 0; i < P.length - 1; i++) {
         const a = P[i], b = P[i + 1];
         const dr = b.r - a.r, dz = b.z - a.z, l = Math.hypot(dr, dz); if (l < 1e-9) continue;
@@ -4248,6 +4698,147 @@ const CMDHELP = (() => {
       }
       return (GFX.toolMeshes[key] = makeMesh(pos, nor, col));
     }
+
+    /* --- Späne und Kühlmittel (Partikel im Tisch-/Rohteilkoordinatensystem) --- */
+    const FX = (() => {
+      const MAXC = 5000, MAXW = 900;
+      const C = { p: new Float32Array(MAXC * 3), v: new Float32Array(MAXC * 3), col: new Float32Array(MAXC * 3), s: new Float32Array(MAXC), live: new Uint8Array(MAXC), n: 0, next: 0 };
+      const Wd = { p: new Float32Array(MAXW * 3), v: new Float32Array(MAXW * 3), life: new Float32Array(MAXW), s: new Float32Array(MAXW), next: 0 };
+      let lastRemoved = 0, flying = 0, emitAcc = 0, wAcc = 0, active = false;
+      const ptP = prog(`#version 300 es
+        in vec3 aP; in vec4 aC; in float aS;
+        uniform mat4 uVP; uniform vec3 uShift; uniform float uPx;
+        out vec4 vC;
+        void main(){ gl_Position = uVP*vec4(aP+uShift,1.0); gl_PointSize = clamp(aS*uPx/gl_Position.w, 1.5, 16.0); vC = aC; }`, `#version 300 es
+        precision mediump float; in vec4 vC; out vec4 o;
+        void main(){ vec2 d = gl_PointCoord*2.0-1.0; float r = dot(d,d); if (r > 1.0) discard; o = vec4(vC.rgb*(1.05-0.35*r), vC.a); }`);
+      const vao = gl.createVertexArray(), buf = gl.createBuffer();
+      gl.bindVertexArray(vao); gl.bindBuffer(gl.ARRAY_BUFFER, buf);
+      const st = 8 * 4;
+      [['aP', 3, 0], ['aC', 4, 12], ['aS', 1, 28]].forEach(([n, k, o]) => { const l = gl.getAttribLocation(ptP.p, n); if (l >= 0) { gl.enableVertexAttribArray(l); gl.vertexAttribPointer(l, k, gl.FLOAT, false, st, o); } });
+      gl.bindVertexArray(null);
+      const data = new Float32Array((MAXC + MAXW) * 8);
+      function clear() { C.live.fill(0); C.n = 0; Wd.life.fill(0); flying = 0; }
+      const onStock = (x, y) => stock && x >= stock.x0 && y >= stock.y0 && x < stock.x0 + stock.L && y < stock.y0 + stock.B;
+      function ground(x, y) {
+        if (stock && x >= stock.x0 && y >= stock.y0 && x < stock.x0 + stock.L && y < stock.y0 + stock.B) {
+          const i = Math.min(stock.nx - 1, Math.floor((x - stock.x0) / stock.cx)), j = Math.min(stock.ny - 1, Math.floor((y - stock.y0) / stock.cy));
+          return stock.h[(j * stock.nx + i) * 2];
+        }
+        let top = -Infinity;
+        for (const b of GFX.viseTops || []) if (x >= b[0] && x <= b[2] && y >= b[1] && y <= b[3] && b[4] > top) top = b[4];
+        if (top > -Infinity) return top;
+        const T = GFX.tableRect;
+        if (T && x >= T.x0 && x <= T.x1 && y >= T.y0 && y <= T.y1) return T.z;
+        return -Infinity;
+      }
+      function spawnChip(cs, tl, depth) {
+        const k = C.next; C.next = (C.next + 1) % MAXC; if (!C.live[k]) C.n++;
+        const R = tl.D / 2, a = Math.random() * Math.PI * 2, dir = cs.m && cs.m.spindle === 'M4' ? -1 : 1;
+        const h = Math.random() * Math.max(0.3, Math.min(depth, tl.lc || depth));
+        C.p[k * 3] = cs.pos.x + R * Math.cos(a); C.p[k * 3 + 1] = cs.pos.y + R * Math.sin(a); C.p[k * 3 + 2] = cs.pos.z + h;
+        const sp = 90 + Math.random() * 220, tx = Math.sin(a) * dir, ty = -Math.cos(a) * dir;     // tangential (M3 im Uhrzeigersinn)
+        C.v[k * 3] = (tx * 0.8 + Math.cos(a) * 0.5) * sp; C.v[k * 3 + 1] = (ty * 0.8 + Math.sin(a) * 0.5) * sp; C.v[k * 3 + 2] = (0.4 + Math.random() * 0.9) * sp;
+        const f = 0.85 + Math.random() * 0.35;
+        C.col[k * 3] = Math.min(1, rawCol[0] * f); C.col[k * 3 + 1] = Math.min(1, rawCol[1] * f); C.col[k * 3 + 2] = Math.min(1, rawCol[2] * f);
+        C.s[k] = Math.max(0.6, Math.min(2.2, tl.D * 0.09)) * (0.7 + Math.random() * 0.6);
+        C.live[k] = 2;    // 2 = fliegt, 1 = liegt
+      }
+      function spawnDrop(x, y, z, vx, vy, vz, life, s) {
+        const k = Wd.next; Wd.next = (Wd.next + 1) % MAXW;
+        Wd.p[k * 3] = x; Wd.p[k * 3 + 1] = y; Wd.p[k * 3 + 2] = z; Wd.v[k * 3] = vx; Wd.v[k * 3 + 1] = vy; Wd.v[k * 3 + 2] = vz; Wd.life[k] = life; Wd.s[k] = s;
+      }
+      function step(dt, cs) {
+        if (!stock) return;
+        if (stock.removed < lastRemoved - 1e-6) clear();
+        const dRem = Math.max(0, stock.removed - lastRemoved); lastRemoved = stock.removed;
+        const tl = cs.tool >= 0 ? S.tools[cs.tool] : null;
+        const run = SIM.playing && cs.m && cs.m.spindle !== 'M5';
+        // Späne aus dem abgetragenen Volumen
+        if (GFX.showChips && tl && dRem > 0 && SIM.playing) {
+          emitAcc += Math.min(60, 2 + Math.sqrt(dRem) * 2.2);
+          const depth = Math.max(0.2, stock.H - cs.pos.z);
+          while (emitAcc >= 1) { spawnChip(cs, tl, depth); emitAcc -= 1; }
+        }
+        // Kühlmittelstrahl aus der Düse zur Werkzeugspitze
+        if (GFX.showCoolant && run && cs.m.coolant && tl) {
+          const P = PAL.toolOutline(tl), Lt = P[P.length - 1].z;
+          const nx = cs.pos.x + 28, ny = cs.pos.y - 28, nz = cs.pos.z + Lt + 12;
+          const tx = cs.pos.x, ty = cs.pos.y, tz = cs.pos.z + Math.min(4, tl.lc * 0.3);
+          let dx = tx - nx, dy = ty - ny, dz = tz - nz; const L = Math.hypot(dx, dy, dz) || 1; dx /= L; dy /= L; dz /= L;
+          wAcc += dt * 900;
+          while (wAcc >= 1) {
+            wAcc -= 1;
+            const sp = 650 + Math.random() * 150, j = 0.04;
+            const u0 = Math.random() * dt * sp;
+            spawnDrop(nx + dx * u0, ny + dy * u0, nz + dz * u0, (dx + (Math.random() - 0.5) * j) * sp, (dy + (Math.random() - 0.5) * j) * sp, (dz + (Math.random() - 0.5) * j) * sp, L / sp * 1.6, 1.4 + Math.random() * 1.0);
+          }
+        } else wAcc = 0;
+        const g = 3500;
+        flying = 0;
+        for (let k = 0; k < MAXC; k++) {
+          if (C.live[k] !== 2) continue;
+          flying++;
+          C.v[k * 3 + 2] -= g * dt;
+          const x = C.p[k * 3] + C.v[k * 3] * dt, y = C.p[k * 3 + 1] + C.v[k * 3 + 1] * dt, z = C.p[k * 3 + 2] + C.v[k * 3 + 2] * dt;
+          const gz = ground(x, y);
+          if (z <= gz && C.v[k * 3 + 2] < 0) {
+            if (onStock(x, y)) {
+              // Auf dem Werkstück bleiben keine Späne liegen: abprallen, beim zweiten Aufprall verschwinden
+              if (C.s[k] < 0) { C.live[k] = 0; C.n--; continue; }
+              C.s[k] = -C.s[k];
+              C.p[k * 3] = x; C.p[k * 3 + 1] = y; C.p[k * 3 + 2] = gz + 0.2;
+              C.v[k * 3 + 2] = -C.v[k * 3 + 2] * 0.35; C.v[k * 3] *= 0.6; C.v[k * 3 + 1] *= 0.6;
+            } else { C.p[k * 3] = x; C.p[k * 3 + 1] = y; C.p[k * 3 + 2] = gz + 0.15; C.live[k] = 1; }
+          }
+          else if (z < -400) { C.live[k] = 0; C.n--; }
+          else { C.p[k * 3] = x; C.p[k * 3 + 1] = y; C.p[k * 3 + 2] = z; }
+        }
+        let drops = 0;
+        for (let k = 0; k < MAXW; k++) {
+          if (Wd.life[k] <= 0) continue;
+          Wd.life[k] -= dt; drops++;
+          Wd.v[k * 3 + 2] -= g * dt * 0.5;
+          const x = Wd.p[k * 3] + Wd.v[k * 3] * dt, y = Wd.p[k * 3 + 1] + Wd.v[k * 3 + 1] * dt, z = Wd.p[k * 3 + 2] + Wd.v[k * 3 + 2] * dt;
+          const gz = ground(x, y);
+          if (z <= gz) {
+            Wd.life[k] = 0;
+            if (Math.random() < 0.35) { const a = Math.random() * 6.283, sp = 60 + Math.random() * 90; spawnDrop(x, y, gz + 0.2, Math.cos(a) * sp, Math.sin(a) * sp, 40 + Math.random() * 80, 0.25, 0.5); }
+          } else { Wd.p[k * 3] = x; Wd.p[k * 3 + 1] = y; Wd.p[k * 3 + 2] = z; }
+        }
+        active = flying > 0 || drops > 0;
+        return active;
+      }
+      function draw(sh) {
+        let n = 0;
+        if (GFX.showChips) for (let k = 0; k < MAXC; k++) {
+          if (!C.live[k]) continue;
+          const o = n * 8;
+          data[o] = C.p[k * 3]; data[o + 1] = C.p[k * 3 + 1]; data[o + 2] = C.p[k * 3 + 2];
+          data[o + 3] = C.col[k * 3]; data[o + 4] = C.col[k * 3 + 1]; data[o + 5] = C.col[k * 3 + 2]; data[o + 6] = 1; data[o + 7] = Math.abs(C.s[k]); n++;
+        }
+        const nc = n;
+        if (GFX.showCoolant) for (let k = 0; k < MAXW; k++) {
+          if (Wd.life[k] <= 0) continue;
+          const o = n * 8;
+          data[o] = Wd.p[k * 3]; data[o + 1] = Wd.p[k * 3 + 1]; data[o + 2] = Wd.p[k * 3 + 2];
+          data[o + 3] = 0.45; data[o + 4] = 0.72; data[o + 5] = 0.95; data[o + 6] = 0.55; data[o + 7] = Wd.s[k]; n++;
+        }
+        if (!n) return;
+        gl.useProgram(ptP.p);
+        gl.uniformMatrix4fv(ptP.u.uVP, false, VP); gl.uniform3fv(ptP.u.uShift, sh); gl.uniform1f(ptP.u.uPx, GFX.pxScale || 500);
+        gl.bindVertexArray(vao); gl.bindBuffer(gl.ARRAY_BUFFER, buf);
+        gl.bufferData(gl.ARRAY_BUFFER, data.subarray(0, n * 8), gl.DYNAMIC_DRAW);
+        gl.drawArrays(gl.POINTS, 0, nc);
+        if (n > nc) {
+          gl.enable(gl.BLEND); gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA); gl.depthMask(false);
+          gl.drawArrays(gl.POINTS, nc, n - nc);
+          gl.depthMask(true); gl.disable(gl.BLEND);
+        }
+      }
+      return { step, draw, clear, get active() { return active; } };
+    })();
+    GFX.fx = FX;
 
     /* --- Bahnen --- */
     let pathVAO = null, pathCount = 0, axisVAO = null, axisCount = 0;
@@ -4321,7 +4912,8 @@ const CMDHELP = (() => {
       const s = ST(), L = Math.max(14, Math.min(40, 0.22 * Math.max(s.L, s.B))), r = L * 0.016;
       const c = Math.cos(f.phi * Math.PI / 180), sn = Math.sin(f.phi * Math.PI / 180);
       const o = [f.ox, f.oy, f.oz];
-      const dirs = [[c * f.mx, sn * f.mx, 0], [-sn * f.my, c * f.my, 0], [0, 0, 1]];
+      const R = f.R, rot = v => (R ? [R[0] * v[0] + R[1] * v[1] + R[2] * v[2], R[3] * v[0] + R[4] * v[1] + R[5] * v[2], R[6] * v[0] + R[7] * v[1] + R[8] * v[2]] : v);
+      const dirs = [[c * f.mx, sn * f.mx, 0], [-sn * f.my, c * f.my, 0], [0, 0, 1]].map(rot);
       const cols = [[0.82, 0.36, 0.36], [0.32, 0.64, 0.4], [0.34, 0.5, 0.84]];
       const g = { p: [], n: [], c: [] };
       dirs.forEach((d, i) => arrowGeo(g, o, d, L, r, cols[i]));
@@ -4357,6 +4949,7 @@ const CMDHELP = (() => {
       if (cam.ortho) { const hh = 2 * cam.dist * Math.tan(cam.fov / 2); P = M4.ortho(hh * asp, hh, -cam.dist * 10, cam.dist * 30); }
       else P = M4.persp(cam.fov, asp, n, f);
       VP = M4.mul(P, V);
+      GFX.pxScale = P[5] * h / 2;
       return e;
     }
     GFX.fit = (whole) => {
@@ -4396,6 +4989,15 @@ const CMDHELP = (() => {
       e.currentTarget.setAttribute('aria-pressed', String(GFX.showTable)); GFX.dirty = true;
     });
     $('btnMachine').setAttribute('aria-pressed', String(GFX.showMachine));
+    GFX.showColors = S.showColors !== false;
+    $('btnCols').hidden = false; $('btnCols').setAttribute('aria-pressed', String(GFX.showColors));
+    $('btnCols').addEventListener('click', e => { GFX.showColors = !GFX.showColors; S.showColors = GFX.showColors; saveState(); e.currentTarget.setAttribute('aria-pressed', String(GFX.showColors)); GFX.dirty = true; });
+    GFX.showChips = S.showChips !== false; GFX.showCoolant = S.showCoolant !== false;
+    $('btnChips').hidden = false; $('btnCool').hidden = false;
+    $('btnChips').setAttribute('aria-pressed', String(GFX.showChips));
+    $('btnCool').setAttribute('aria-pressed', String(GFX.showCoolant));
+    $('btnChips').addEventListener('click', e => { GFX.showChips = !GFX.showChips; S.showChips = GFX.showChips; saveState(); e.currentTarget.setAttribute('aria-pressed', String(GFX.showChips)); GFX.dirty = true; });
+    $('btnCool').addEventListener('click', e => { GFX.showCoolant = !GFX.showCoolant; S.showCoolant = GFX.showCoolant; saveState(); e.currentTarget.setAttribute('aria-pressed', String(GFX.showCoolant)); GFX.dirty = true; });
     $('btnMachine').addEventListener('click', e => {
       GFX.showMachine = !GFX.showMachine; S.showMachine = GFX.showMachine; saveState();
       e.currentTarget.setAttribute('aria-pressed', String(GFX.showMachine)); GFX.fit(true);
@@ -4410,14 +5012,12 @@ const CMDHELP = (() => {
       const sc = 2 * cam.dist * Math.tan(cam.fov / 2) / canvas.clientHeight;
       for (let i = 0; i < 3; i++) cam.target[i] += (-r[i] * dx + u[i] * dy) * sc;
     };
-    GFX.panMode = false;
-    $('btnPanMode').hidden = false;
-    $('btnPanMode').addEventListener('click', e => { GFX.panMode = !GFX.panMode; e.currentTarget.setAttribute('aria-pressed', String(GFX.panMode)); });
+
     canvas.addEventListener('contextmenu', e => e.preventDefault());
     canvas.addEventListener('pointerdown', e => {
       try { canvas.setPointerCapture(e.pointerId); } catch (er) { /* ohne Capture */ }
       ptrs.set(e.pointerId, { x: e.clientX, y: e.clientY });
-      mode = e.button === 2 || e.button === 1 || e.shiftKey || (GFX.panMode && e.pointerType !== 'mouse') ? 'pan' : 'rot';
+      mode = e.button === 2 || e.button === 1 || e.shiftKey ? 'pan' : 'rot';
       if (ptrs.size === 2) { const [a, b] = [...ptrs.values()]; pinch0 = Math.hypot(a.x - b.x, a.y - b.y); cen0 = [(a.x + b.x) / 2, (a.y + b.y) / 2]; }
     });
     canvas.addEventListener('pointermove', e => {
@@ -4453,7 +5053,8 @@ const CMDHELP = (() => {
     readTheme(); GFX.readTheme = readTheme;
     new MutationObserver(readTheme).observe(document.documentElement, { attributes: true, attributeFilter: ['data-theme'] });
     try { matchMedia('(prefers-color-scheme: dark)').addEventListener('change', readTheme); } catch (e) { /* alt */ }
-    const palFlat = new Float32Array(PAL_COLORS.flatMap(hex));
+    const palFlat = new Float32Array(72);
+    const updPal = () => { for (let i = 0; i < 24; i++) { const c = hex(S.tools[i] ? toolColor(S.tools[i]) : PAL_COLORS[i % 8]); palFlat.set(c, i * 3); } };
 
     function resize() {
       const dpr = Math.min(2, window.devicePixelRatio || 1);
@@ -4506,7 +5107,7 @@ const CMDHELP = (() => {
       gl.useProgram(stockP.p);
       gl.uniformMatrix4fv(stockP.u.uVP, false, VP); gl.uniform3fv(stockP.u.uEye, e); gl.uniform3fv(stockP.u.uShift, sh);
       gl.uniform2i(stockP.u.uN, stock.nx, stock.ny); gl.uniform2f(stockP.u.uO, stock.x0, stock.y0); gl.uniform2f(stockP.u.uC, stock.cx, stock.cy);
-      gl.uniform1f(stockP.u.uBot, 0); gl.uniform3fv(stockP.u.uRaw, rawCol); gl.uniform3fv(stockP.u.uPal, palFlat);
+      updPal(); gl.uniform1f(stockP.u.uBot, 0); gl.uniform3fv(stockP.u.uRaw, rawCol); gl.uniform3fv(stockP.u.uPal, palFlat); gl.uniform1f(stockP.u.uCols, GFX.showColors === false ? 0 : 1);
       gl.activeTexture(gl.TEXTURE0); gl.bindTexture(gl.TEXTURE_2D, hTex); gl.uniform1i(stockP.u.uH, 0);
       gl.activeTexture(gl.TEXTURE1); gl.bindTexture(gl.TEXTURE_2D, oTex); gl.uniform1i(stockP.u.uOffT, 1); gl.activeTexture(gl.TEXTURE0);
       {
@@ -4514,7 +5115,8 @@ const CMDHELP = (() => {
         for (const tp of SIM.taps || []) {
           if (SIM.T <= tp.t0 || hs.length >= 96) continue;
           const f = Math.min(1, (SIM.T - tp.t0) / Math.max(1e-9, tp.t1 - tp.t0));
-          hs.push(tp.x, tp.y, tp.r, tp.p); hz.push(tp.za + (tp.zb - tp.za) * f, tp.za);
+          hs.push(tp.x, tp.y, tp.r, tp.p);
+          if (tp.up) hz.push(tp.zb, tp.zb + (tp.za - tp.zb) * f); else hz.push(tp.za + (tp.zb - tp.za) * f, tp.za);
         }
         const n = hs.length / 4;
         if (n) { gl.uniform4fv(stockP.u.uHole, new Float32Array(hs.concat(new Array(96 - hs.length).fill(0)))); gl.uniform2fv(stockP.u.uHoleZ, new Float32Array(hz.concat(new Array(48 - hz.length).fill(0)))); }
@@ -4542,12 +5144,15 @@ const CMDHELP = (() => {
         gl.bindVertexArray(GFX.nose.vao); gl.drawArrays(gl.TRIANGLES, 0, GFX.nose.count);
       }
 
+      // Späne und Kühlmittel
+      FX.draw(sh);
+
       // Achsen
       let fr = cs.m && cs.m.frame ? cs.m.frame : null;
       if (!fr) { const z = toInt(S.zero.G54); fr = { ox: z.x, oy: z.y, oz: z.z, phi: 0, mx: 1, my: 1 }; }
       const wOn = GFX.showWks && !(cs.m && cs.m.zp === 'G53' && !(cs.m.frame && cs.m.frame.shifted));
       if (wOn) {
-        const wk = [fr.ox, fr.oy, fr.oz, fr.phi, fr.mx, fr.my, S.stock.L, S.stock.B].join(',');
+        const wk = [fr.ox, fr.oy, fr.oz, fr.phi, fr.mx, fr.my, S.stock.L, S.stock.B, fr.R ? fr.R.join(':') : ''].join(',');
         if (wk !== wksKey) { buildWks(fr); wksKey = wk; }
         gl.useProgram(meshP.p); gl.uniform1f(meshP.u.uAlpha, 0.7);
         gl.uniform3f(meshP.u.uOff, sh[0], sh[1], sh[2]);
@@ -4562,7 +5167,7 @@ const CMDHELP = (() => {
       gl.useProgram(lineP.p); gl.uniformMatrix4fv(lineP.u.uVP, false, VP); gl.uniform1f(lineP.u.uT, SIM.T); gl.uniform3fv(lineP.u.uShift, sh);
       gl.uniform1f(lineP.u.uGhost, 0);
       gl.disable(gl.DEPTH_TEST);
-      gl.bindVertexArray(axisVAO); gl.drawArrays(gl.LINES, 0, axisCount);
+      if (GFX.showWks) { gl.bindVertexArray(axisVAO); gl.drawArrays(gl.LINES, 0, axisCount); }
       if (GFX.showPath && pathCount) {
         gl.uniform1f(lineP.u.uGhost, 1);
         gl.bindVertexArray(pathVAO); gl.drawArrays(gl.LINES, 0, pathCount);
@@ -4578,9 +5183,98 @@ const CMDHELP = (() => {
         if (wOn && wksTips) placeLabel($(id), [wksTips[i][0] + sh[0], wksTips[i][1] + sh[1], wksTips[i][2]]);
         else $(id).hidden = true;
       });
-      placeLabel($('lblM'), [MO.x + sh[0], MO.y + sh[1], MO.z]);
+      if (GFX.showWks) placeLabel($('lblM'), [MO.x + sh[0], MO.y + sh[1], MO.z]); else $('lblM').hidden = true;
     };
   }
+
+  /* ---------------- Geräusche (Web Audio, synthetisch) ---------------- */
+  const SND = (() => {
+    let ac = null, master, spin = {}, cut = {}, rap = {}, cool = {}, on = S.sound !== false, cutLvl = 0, lastRem = 0;
+    function noiseBuf() {
+      const b = ac.createBuffer(1, ac.sampleRate * 2, ac.sampleRate), d = b.getChannelData(0);
+      for (let i = 0; i < d.length; i++) d[i] = Math.random() * 2 - 1;
+      return b;
+    }
+    function noiseSrc(buf) { const n = ac.createBufferSource(); n.buffer = buf; n.loop = true; n.start(); return n; }
+    function init() {
+      if (ac) return true;
+      const AC = window.AudioContext || window.webkitAudioContext; if (!AC) return false;
+      try { ac = new AC(); } catch (e) { return false; }
+      master = ac.createGain(); master.gain.value = 0.6; master.connect(ac.destination);
+      const nb = noiseBuf();
+      // Spindel: Motorbrummen + Pfeifen
+      spin.g = ac.createGain(); spin.g.gain.value = 0; spin.g.connect(master);
+      spin.o1 = ac.createOscillator(); spin.o1.type = 'sawtooth'; spin.o2 = ac.createOscillator(); spin.o2.type = 'sine';
+      spin.lp = ac.createBiquadFilter(); spin.lp.type = 'lowpass'; spin.lp.frequency.value = 900;
+      const g1 = ac.createGain(); g1.gain.value = 0.35; const g2 = ac.createGain(); g2.gain.value = 0.25;
+      spin.o1.connect(g1).connect(spin.lp).connect(spin.g); spin.o2.connect(g2).connect(spin.g);
+      spin.o1.start(); spin.o2.start();
+      // Zerspanen: gefiltertes Rauschen + Schneideneingriff (Zahnfrequenz)
+      cut.g = ac.createGain(); cut.g.gain.value = 0; cut.g.connect(master);
+      cut.bp = ac.createBiquadFilter(); cut.bp.type = 'bandpass'; cut.bp.Q.value = 1.2;
+      noiseSrc(nb).connect(cut.bp).connect(cut.g);
+      cut.tg = ac.createGain(); cut.tg.gain.value = 0; cut.tg.connect(master);
+      cut.to = ac.createOscillator(); cut.to.type = 'square';
+      cut.tl = ac.createBiquadFilter(); cut.tl.type = 'lowpass'; cut.tl.frequency.value = 1400;
+      cut.to.connect(cut.tl).connect(cut.tg); cut.to.start();
+      // Eilgang: Servopfeifen
+      rap.g = ac.createGain(); rap.g.gain.value = 0; rap.g.connect(master);
+      rap.o = ac.createOscillator(); rap.o.type = 'triangle'; rap.o.frequency.value = 520; rap.o.connect(rap.g); rap.o.start();
+      // Kühlmittel: Rauschen hochpass
+      cool.g = ac.createGain(); cool.g.gain.value = 0; cool.g.connect(master);
+      cool.hp = ac.createBiquadFilter(); cool.hp.type = 'highpass'; cool.hp.frequency.value = 2500;
+      noiseSrc(nb).connect(cool.hp).connect(cool.g);
+      return true;
+    }
+    const set = (p, v, t = 0.08) => p.setTargetAtTime(v, ac.currentTime, t);
+    function clunk() {
+      if (!ac || !on) return;
+      const t0 = ac.currentTime;
+      [0, 0.35, 0.9].forEach((d, k) => {
+        const o = ac.createOscillator(), g = ac.createGain();
+        o.type = 'triangle'; o.frequency.setValueAtTime(k === 1 ? 180 : 110, t0 + d); o.frequency.exponentialRampToValueAtTime(45, t0 + d + 0.15);
+        g.gain.setValueAtTime(0.0001, t0 + d); g.gain.exponentialRampToValueAtTime(0.5, t0 + d + 0.01); g.gain.exponentialRampToValueAtTime(0.0001, t0 + d + 0.25);
+        o.connect(g).connect(master); o.start(t0 + d); o.stop(t0 + d + 0.3);
+      });
+    }
+    let lastMove = null;
+    function update(dt, cs) {
+      if (!ac) return;
+      const play = on && SIM.playing && cs && cs.m;
+      if (!play) { set(spin.g.gain, 0, 0.15); set(cut.g.gain, 0); set(cut.tg.gain, 0); set(rap.g.gain, 0); set(cool.g.gain, 0, 0.15); lastRem = stock ? stock.removed : 0; return; }
+      const m = cs.m, tl = cs.tool >= 0 ? S.tools[cs.tool] : null;
+      const n = m.spindle === 'M5' ? 0 : (m.n || 0);
+      // Spindel
+      const f0 = Math.max(30, n / 60);
+      set(spin.o1.frequency, f0); set(spin.o2.frequency, Math.min(4000, f0 * 6));
+      set(spin.g.gain, n > 0 ? 0.05 + Math.min(0.05, n / 400000) : 0, 0.3);
+      // Zerspanungsrate
+      const rem = stock ? stock.removed : 0, dRem = Math.max(0, rem - lastRem); lastRem = rem;
+      const rate = dt > 0 ? dRem / dt / Math.max(1, SIM.speed) : 0;
+      cutLvl += ((rate > 0.01 ? Math.min(1, 0.25 + Math.log10(1 + rate) / 3) : 0) - cutLvl) * Math.min(1, dt * 8);
+      let band = 2200, tone = 0, toneG = 0, noiseG = 0.22;
+      const type = tl ? tl.type : 'flat';
+      if (type === 'drill' || type === 'center') { band = 900; tone = Math.max(60, n / 60 * 2); toneG = 0.04; noiseG = 0.25; }
+      else if (type === 'tap') { band = 400; tone = Math.max(40, n / 60); toneG = 0.06; noiseG = 0.18; }
+      else if (type === 'face') { band = 1500; tone = n / 60 * (tl.z || 4); toneG = 0.07; noiseG = 0.25; }
+      else { band = type === 'chamfer' ? 2800 : 2000; tone = n / 60 * (tl && tl.z || 3); toneG = 0.05; noiseG = 0.2; }
+      set(cut.bp.frequency, band); set(cut.to.frequency, Math.max(30, Math.min(3000, tone)));
+      set(cut.g.gain, cutLvl * noiseG, 0.05); set(cut.tg.gain, cutLvl * toneG, 0.05);
+      // Eilgang
+      const rapid = m.kind === 'G0' || (m.kind === 'WZW' && !(m.len < 1e-9));
+      set(rap.g.gain, rapid ? 0.035 : 0, 0.06); if (rapid) set(rap.o.frequency, 480 + Math.min(400, (m.vf || 0) / 30));
+      // Kühlmittel
+      set(cool.g.gain, m.coolant && n > 0 ? 0.03 : 0, 0.2);
+      // Werkzeugwechsel
+      if (m !== lastMove && m.label === 'Werkzeugwechsel') clunk();
+      lastMove = m;
+    }
+    function setOn(v) { on = v; S.sound = v; saveState(); if (v) start(); else if (ac) master.gain.setTargetAtTime(0, ac.currentTime, 0.05); }
+    function start() { if (!on) return; if (init()) { if (ac.state === 'suspended') ac.resume(); master.gain.setTargetAtTime(0.6, ac.currentTime, 0.05); } }
+    return { update, start, setOn, get on() { return on; } };
+  })();
+  $('btnSound').setAttribute('aria-pressed', String(SND.on));
+  $('btnSound').addEventListener('click', e => { SND.setOn(!SND.on); e.currentTarget.setAttribute('aria-pressed', String(SND.on)); });
 
   /* ---------------- Hauptschleife ---------------- */
   let last = performance.now();
@@ -4604,16 +5298,19 @@ const CMDHELP = (() => {
       $('viewport').style.setProperty('--flash', SIM.flash.toFixed(3));
       GFX.dirty = true;
     }
-    if (GFX.dirty || SIM.playing) {
+    if (GFX.dirty || SIM.playing || (GFX.fx && GFX.fx.active)) {
       const cs = updateDRO();
+      if (GFX.fx) GFX.fx.step(dt, cs);
+      SND.update(dt, cs);
       if (GFX.draw) GFX.draw(cs);
       GFX.dirty = false;
-    }
+    } else SND.update(dt, null);
     requestAnimationFrame(frame);
   }
 
+  for (const el of document.querySelectorAll('.plist, .msglist, .helpdock, .exlist, .helpwrap')) touchScroll(el, tapClick);
   /* ---------------- Start ---------------- */
-  applyMat(); applyUiToggles();
+  setMO(); applyMat(); applyUiToggles();
   interpret(true);
   GFX.fit(true);
   show('prog');
