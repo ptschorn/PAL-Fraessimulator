@@ -35,7 +35,7 @@ button { cursor: pointer; }
 .grow { flex: 1; min-width: 0; }
 [hidden] { display: none !important; }
 /* Touch: Scrollbereiche gezielt freigeben, kein Mitziehen der ganzen Seite */
-#code, .plist, .msglist, .scroll, .exlist, .helpdock, .helpwrap, .gutter { -webkit-overflow-scrolling: touch; overscroll-behavior: contain; touch-action: pan-x pan-y; }
+.plist, .msglist, .scroll, .exlist, .helpdock, .helpwrap, .gutter { -webkit-overflow-scrolling: touch; overscroll-behavior: contain; touch-action: pan-x pan-y; }
 .key, .sk, .btn, .pill, .typ, .vb { touch-action: manipulation; -webkit-tap-highlight-color: transparent; }
 .key, .sk { -webkit-user-select: none; user-select: none; -webkit-touch-callout: none; }
 
@@ -106,19 +106,20 @@ main { min-height: 0; position: relative; }
 
 /* Programm-Editor */
 .progwin { flex: 1; }
-.editor { flex: 1; min-height: 120px; display: flex; position: relative; overflow: hidden; background: #fff; }
-.gutter { width: 58px; flex: none; overflow: hidden; background: var(--win-2); border-right: 1px solid var(--line); }
+.editor { flex: 1; min-height: 120px; display: block; position: relative; overflow: auto; background: #fff; -webkit-overflow-scrolling: touch; overscroll-behavior: contain; touch-action: pan-x pan-y; }
+.edrow { display: flex; min-height: 100%; min-width: 100%; width: max-content; }
+.gutter { width: 58px; flex: none; background: var(--win-2); border-right: 1px solid var(--line); position: sticky; left: 0; z-index: 2; }
 .gutter-inner, .hl-inner { padding: 6px 0; will-change: transform; }
 .g-l { height: var(--lh); font: 13.5px/var(--lh) var(--f-mono); color: var(--faint); text-align: right; padding-right: 9px; font-variant-numeric: tabular-nums; }
 .g-l.edit { color: #b4561c; font-weight: 600; }
 .g-l.err { color: var(--err); font-weight: 600; }
-.code-wrap { position: relative; flex: 1; min-width: 0; }
-.hl { position: absolute; inset: 0; margin: 0; overflow: hidden; pointer-events: none; }
-.hl-l { height: var(--lh); font: 16px/var(--lh) var(--f-mono); white-space: pre; padding: 0 14px; }
+.code-wrap { position: relative; flex: 1 0 auto; }
+.hl { position: relative; margin: 0; pointer-events: none; }
+.hl-l { height: var(--lh); font: 16px/var(--lh) var(--f-mono); white-space: pre; padding: 0 54px 0 14px; }
 .hl-l.edit { background: var(--accent-soft); box-shadow: inset 4px 0 var(--accent); }
 .hl-l.err { background: rgba(192, 38, 45, .1); box-shadow: inset 4px 0 var(--err); }
 .hl-l.crash { background: rgba(183, 121, 31, .14); }
-#code { position: absolute; inset: 0; width: 100%; height: 100%; resize: none; border: 0; outline: none; background: transparent; color: transparent; caret-color: var(--accent); font: 16px/var(--lh) var(--f-mono); padding: 6px 14px; white-space: pre; overflow: auto; tab-size: 4; }
+#code { position: absolute; inset: 0; width: 100%; height: 100%; resize: none; border: 0; outline: none; background: transparent; color: transparent; caret-color: var(--accent); font: 16px/var(--lh) var(--f-mono); padding: 6px 14px; white-space: pre; overflow: hidden; tab-size: 4; }
 #code::selection { background: rgba(29, 79, 134, .25); color: transparent; }
 .syn-g { color: var(--blue); font-weight: 600; } .syn-m { color: var(--purple); font-weight: 600; } .syn-t { color: #b4561c; font-weight: 600; }
 .syn-fs { color: var(--ok); } .syn-ax { color: var(--ink); } .syn-n { color: var(--faint); } .syn-c { color: #7d8794; font-style: italic; }
@@ -184,6 +185,9 @@ main { min-height: 0; position: relative; }
 .vb:hover { background: var(--win-2); }
 .vb[aria-pressed="true"] { background: var(--accent-soft); color: var(--accent-2); border-color: var(--accent-line); }
 .vsep { width: 1px; background: var(--line-2); margin: 2px 3px; }
+.panbtn { right: 8px; top: 8px; display: none; align-items: center; gap: 6px; padding: 6px 10px; font: 600 13px var(--f-ui); color: var(--ink-2); touch-action: manipulation; }
+.panbtn[aria-pressed="true"] { background: var(--accent); color: #fff; border-color: var(--accent); }
+@media (pointer: coarse), (any-pointer: coarse) { .panbtn:not([hidden]) { display: inline-flex; } }
 .legend { right: 8px; bottom: 8px; padding: 4px 9px; display: flex; gap: 10px; font: 12px var(--f-mono); color: var(--ink-2); }
 .legend i { display: inline-block; width: 14px; height: 0; border-top: 2px solid; vertical-align: middle; margin-right: 4px; }
 .small .legend { display: none; }
@@ -396,10 +400,12 @@ table.grid { width: 100%; border-collapse: collapse; }
           <button class="whbtn" id="btnKeysTog" type="button" aria-pressed="true">Tastenfeld</button>
           <span class="info" id="progPos"></span></div>
         <div class="editor" id="editor">
+          <div class="edrow">
           <div class="gutter" aria-hidden="true"><div class="gutter-inner" id="gutterInner"></div></div>
           <div class="code-wrap">
             <div class="hl" aria-hidden="true"><div class="hl-inner" id="hlInner"></div></div>
             <textarea id="code" spellcheck="false" autocomplete="off" autocapitalize="characters" wrap="off" aria-label="PAL-Programm"></textarea>
+          </div>
           </div>
         </div>
       </div>
@@ -455,6 +461,9 @@ table.grid { width: 100%; border-collapse: collapse; }
                 </div>
               </div>
             </div>
+            <button class="overlay panbtn" id="btnPanMode" type="button" aria-pressed="false" hidden title="Ein Finger verschiebt den Ausschnitt statt zu drehen">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 2v20M2 12h20M12 2l-3 3M12 2l3 3M12 22l-3-3M12 22l3-3M2 12l3-3M2 12l3 3M22 12l-3-3M22 12l-3 3"/></svg>
+              <span>Verschieben</span></button>
             <div class="overlay legend" aria-hidden="true">
               <span><i style="border-top:2px dashed #e6474d"></i>G0</span>
               <span><i style="border-color:#12b887"></i>G1</span>
@@ -800,12 +809,6 @@ table.grid { width: 100%; border-collapse: collapse; }
 <div><h2 id="aboutT">PAL-Frässimulator</h2><p>Fräsen mit PAL im Browser simulieren</p></div></div>
     <div class="about-body">
       CNC-Fräsprogramme nach PAL (Prüfungsaufgaben- und Lehrmittelentwicklungsstelle der IHK) schreiben, prüfen und in 3D simulieren – ohne Installation, direkt im Browser.
-      <ul>
-        <li>Wegbefehle, Radiuskorrektur, Polarkoordinaten, Unterprogramme und Zyklen</li>
-        <li>Befehlshilfe mit Pflichtangaben und Tastenfeld wie an der Steuerung</li>
-        <li>Werkzeugtabelle, Rohteil und Nullpunkte G54–G57 einrichten</li>
-        <li>3D-Simulation mit Materialabtrag, Kollisionsmeldungen und Einzelsatz</li>
-      </ul>
       Alle Daten bleiben in diesem Browser bzw. in den gespeicherten Projektdateien.
     </div>
     <dl class="about-meta">
@@ -2435,7 +2438,7 @@ const CMDHELP = (() => {
   const arrow = (x, y, a, c = '#e8590c') => `<path d="M0 0l-9 -5v10z" fill="${c}" transform="translate(${x} ${y}) rotate(${a})"/>`;
   const svg = (label, body) => `<svg role="img" aria-label="${label}" width="140" height="140" viewBox="0 0 150 150">${body}</svg>`;
   const SK = {
-    g0: svg('Skizze: Eilgang vom Startpunkt S zum Endpunkt E', `<path d="M14 136H140M14 136V10" ${ax}/><path d="M30 112L118 40" stroke="#e6474d" stroke-width="3" stroke-dasharray="8 6"/>${arrow(118, 40, -39.3, '#e6474d')}${dot(30, 112)}${dot(118, 40)}${T(16, 106, 'S')}${T(122, 38, 'E')}${T(46, 60, 'ohne Vorschub', '#5b6570')}`),
+    g0: svg('Skizze: Eilgang vom Startpunkt S zum Endpunkt E', `<path d="M14 136H140M14 136V10" ${ax}/><path d="M30 112L118 40" stroke="#e6474d" stroke-width="3" stroke-dasharray="8 6"/>${arrow(118, 40, -39.3, '#e6474d')}${dot(30, 112)}${dot(118, 40)}${T(16, 106, 'S')}${T(122, 38, 'E')}${T(70, 100, 'ohne Vorschub', '#5b6570')}`),
     g1: svg('Skizze: Gerade mit Vorschub vom Startpunkt S zum Endpunkt E, Länge D und Winkel AS', `<path d="M14 136H140M14 136V10" ${ax}/><path d="M30 112L118 40" stroke="#e8590c" stroke-width="3"/>${arrow(118, 40, -39.3)}<path d="M30 112H80" stroke="#1d4f86" stroke-width="1.4" stroke-dasharray="4 3"/><path d="M62 112A32 32 0 0 0 55 92" stroke="#1d4f86" stroke-width="1.4" fill="none"/>${dot(30, 112)}${dot(118, 40)}${T(16, 106, 'S')}${T(122, 38, 'E')}${T(66, 106, 'AS', '#1d4f86', 'IBM Plex Mono')}${T(62, 70, 'D', '#1d4f86', 'IBM Plex Mono')}`),
     g2: svg('Skizze: Kreisbogen im Uhrzeigersinn von S nach E um den Mittelpunkt M, I und J vom Startpunkt aus', `<path d="M14 136H140M14 136V10" ${ax}/><path d="M34 116A60 60 0 0 1 94 56" stroke="#e8590c" stroke-width="3" fill="none"/>${arrow(94, 56, 0)}<path d="M34 116H94" stroke="#1d4f86" stroke-width="1.6" stroke-dasharray="4 3"/><path d="M94 116V56" stroke="#1d4f86" stroke-width="1.6" stroke-dasharray="4 3"/>${dot(34, 116)}${dot(94, 56)}${dot(94, 116, '#1d4f86', 4)}${T(22, 110, 'S')}${T(100, 52, 'E')}${T(99, 130, 'M', '#1d4f86')}${T(58, 130, 'I', '#1d4f86', 'IBM Plex Mono')}${T(100, 90, 'J', '#1d4f86', 'IBM Plex Mono')}`),
     g3: svg('Skizze: Kreisbogen gegen den Uhrzeigersinn von S nach E um den Mittelpunkt M, I und J vom Startpunkt aus', `<path d="M14 136H140M14 136V10" ${ax}/><path d="M94 116A60 60 0 0 0 34 56" stroke="#e8590c" stroke-width="3" fill="none"/>${arrow(34, 56, 180)}<path d="M94 116H34" stroke="#1d4f86" stroke-width="1.6" stroke-dasharray="4 3"/><path d="M34 116V56" stroke="#1d4f86" stroke-width="1.6" stroke-dasharray="4 3"/>${dot(94, 116)}${dot(34, 56)}${dot(34, 116, '#1d4f86', 4)}${T(100, 120, 'S')}${T(22, 50, 'E')}${T(22, 130, 'M', '#1d4f86')}${T(62, 130, 'I', '#1d4f86', 'IBM Plex Mono')}${T(40, 90, 'J', '#1d4f86', 'IBM Plex Mono')}`),
@@ -2690,8 +2693,7 @@ const CMDHELP = (() => {
     syncScroll();
   }
   function syncScroll() {
-    hlInner.style.transform = `translate(${-ta.scrollLeft}px, ${-ta.scrollTop}px)`;
-    gutInner.style.transform = `translateY(${-ta.scrollTop}px)`;
+    // Editor scrollt als Ganzes (Gutter, Farben und Textfeld gemeinsam) – flüssig auch auf dem iPad
     placeHelp();
   }
   function markEdit(prev) {
@@ -2702,7 +2704,8 @@ const CMDHELP = (() => {
   }
   function ensureVisible(l) {
     const top = l * LH;
-    if (top < ta.scrollTop + LH * 0.5 || top > ta.scrollTop + ta.clientHeight - 2 * LH) { ta.scrollTop = Math.max(0, top - ta.clientHeight / 3); syncScroll(); }
+    const E = editorEl;
+    if (top < E.scrollTop + LH * 0.5 || top > E.scrollTop + E.clientHeight - 2 * LH) E.scrollTop = Math.max(0, top - E.clientHeight / 3);
   }
   function setCurLine(l, fromEditor) {
     const L = lines();
@@ -2732,18 +2735,18 @@ const CMDHELP = (() => {
     clearTimeout(editTimer); editTimer = setTimeout(() => interpret(), 350);
   }
   ta.addEventListener('input', () => { keyHelp = null; codeChanged(); cursorFromEditor(); });
-  ta.addEventListener('scroll', syncScroll);
+  ta.addEventListener('scroll', () => { ta.scrollTop = 0; ta.scrollLeft = 0; });   // Textfeld selbst scrollt nie
   for (const ev of ['click', 'keyup', 'select']) ta.addEventListener(ev, cursorFromEditor);
   ta.addEventListener('focus', () => { lastEdit = ta; });
   inp.addEventListener('focus', () => { lastEdit = inp; });
 
   function setLineText(i, text) {
     const L = lines(); L[i] = text;
-    const st = ta.scrollTop, sl = ta.scrollLeft;
+    const st = editorEl.scrollTop, sl = editorEl.scrollLeft;
     ta.value = L.join('\n');
     let pos = 0; for (let k = 0; k < i; k++) pos += L[k].length + 1;
     ta.setSelectionRange(pos, pos);
-    ta.scrollTop = st; ta.scrollLeft = sl;
+    editorEl.scrollTop = st; editorEl.scrollLeft = sl;
     codeChanged();
   }
   inp.addEventListener('input', () => {
@@ -2766,8 +2769,8 @@ const CMDHELP = (() => {
       next = nn ? `N${nn} ` : '';
     }
     L.splice(curLine + 1, 0, next);
-    const st = ta.scrollTop;
-    ta.value = L.join('\n'); ta.scrollTop = st;
+    const st = editorEl.scrollTop;
+    ta.value = L.join('\n'); editorEl.scrollTop = st;
     codeChanged();
     setCurLine(curLine + 1);
     inp.value = next; inp.focus(); inp.setSelectionRange(next.length, next.length);
@@ -3619,7 +3622,7 @@ const CMDHELP = (() => {
   function fileMsg(t) { const n = $('fileMsg'); n.textContent = t; n.hidden = false; clearTimeout(n._t); n._t = setTimeout(() => { n.hidden = true; }, 6000); }
   const isKnown = () => !ta.value.trim() || EXAMPLES.some(e => e.code === ta.value) || LIB.some(p => p.code === ta.value);
   function setCode(code, id = null, name = '') {
-    ta.value = code; S.code = code; S.cur = { id, name }; saveState(); ta.scrollTop = 0; curLine = 0; inp.value = lines()[0] || '';
+    ta.value = code; S.code = code; S.cur = { id, name }; saveState(); editorEl.scrollTop = 0; curLine = 0; inp.value = lines()[0] || '';
     interpret(); GFX.fit(true);
   }
   const fmtDate = t => new Date(t).toLocaleString('de-DE', { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit' });
@@ -4399,32 +4402,41 @@ const CMDHELP = (() => {
     });
 
     /* --- Maus/Touch --- */
-    const ptrs = new Map(); let mode = 'rot', pinch0 = 0;
+    const ptrs = new Map(); let mode = 'rot', pinch0 = 0, cen0 = null;
+    const panBy = (dx, dy) => {
+      const e0 = eye(), f = norm(sub(cam.target, e0));
+      const up = Math.abs(cam.pitch) > 1.55 ? [-Math.cos(cam.yaw), -Math.sin(cam.yaw), 0] : [0, 0, 1];
+      const r = norm(cross(f, up)), u = cross(r, f);
+      const sc = 2 * cam.dist * Math.tan(cam.fov / 2) / canvas.clientHeight;
+      for (let i = 0; i < 3; i++) cam.target[i] += (-r[i] * dx + u[i] * dy) * sc;
+    };
+    GFX.panMode = false;
+    $('btnPanMode').hidden = false;
+    $('btnPanMode').addEventListener('click', e => { GFX.panMode = !GFX.panMode; e.currentTarget.setAttribute('aria-pressed', String(GFX.panMode)); });
     canvas.addEventListener('contextmenu', e => e.preventDefault());
     canvas.addEventListener('pointerdown', e => {
-      canvas.setPointerCapture(e.pointerId); ptrs.set(e.pointerId, { x: e.clientX, y: e.clientY });
-      mode = e.button === 2 || e.button === 1 || e.shiftKey ? 'pan' : 'rot';
-      if (ptrs.size === 2) { const [a, b] = [...ptrs.values()]; pinch0 = Math.hypot(a.x - b.x, a.y - b.y); }
+      try { canvas.setPointerCapture(e.pointerId); } catch (er) { /* ohne Capture */ }
+      ptrs.set(e.pointerId, { x: e.clientX, y: e.clientY });
+      mode = e.button === 2 || e.button === 1 || e.shiftKey || (GFX.panMode && e.pointerType !== 'mouse') ? 'pan' : 'rot';
+      if (ptrs.size === 2) { const [a, b] = [...ptrs.values()]; pinch0 = Math.hypot(a.x - b.x, a.y - b.y); cen0 = [(a.x + b.x) / 2, (a.y + b.y) / 2]; }
     });
     canvas.addEventListener('pointermove', e => {
       if (!ptrs.has(e.pointerId)) return;
       const p = ptrs.get(e.pointerId), dx = e.clientX - p.x, dy = e.clientY - p.y;
       p.x = e.clientX; p.y = e.clientY;
       if (ptrs.size === 2) {
+        // zwei Finger: auseinander/zusammen = Zoom, gemeinsam ziehen = Ausschnitt verschieben
         const [a, b] = [...ptrs.values()]; const d = Math.hypot(a.x - b.x, a.y - b.y);
-        if (pinch0 > 0) cam.dist *= pinch0 / d; pinch0 = d;
+        if (pinch0 > 0 && d > 0) cam.dist = Math.max(5, Math.min(5000, cam.dist * pinch0 / d)); pinch0 = d;
+        const c = [(a.x + b.x) / 2, (a.y + b.y) / 2];
+        if (cen0) panBy(c[0] - cen0[0], c[1] - cen0[1]);
+        cen0 = c;
       } else if (mode === 'rot') {
         cam.yaw -= dx * 0.008; cam.pitch = Math.max(-1.45, Math.min(Math.PI / 2 - 0.0001, cam.pitch + dy * 0.008));
-      } else {
-        const e0 = eye(), f = norm(sub(cam.target, e0));
-        const up = Math.abs(cam.pitch) > 1.55 ? [-Math.cos(cam.yaw), -Math.sin(cam.yaw), 0] : [0, 0, 1];
-        const r = norm(cross(f, up)), u = cross(r, f);
-        const sc = 2 * cam.dist * Math.tan(cam.fov / 2) / canvas.clientHeight;
-        for (let i = 0; i < 3; i++) cam.target[i] += (-r[i] * dx + u[i] * dy) * sc;
-      }
+      } else panBy(dx, dy);
       GFX.dirty = true;
     });
-    const up = e => { ptrs.delete(e.pointerId); if (ptrs.size < 2) pinch0 = 0; };
+    const up = e => { ptrs.delete(e.pointerId); if (ptrs.size < 2) { pinch0 = 0; cen0 = null; } };
     canvas.addEventListener('pointerup', up); canvas.addEventListener('pointercancel', up);
     canvas.addEventListener('wheel', e => { e.preventDefault(); cam.dist *= Math.exp(e.deltaY * 0.0012); cam.dist = Math.max(5, Math.min(5000, cam.dist)); GFX.dirty = true; }, { passive: false });
 
