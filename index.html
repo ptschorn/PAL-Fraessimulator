@@ -459,19 +459,19 @@ table.grid { width: 100%; border-collapse: collapse; }
                 </div>
                 <span class="lbl">Anzeigen</span>
                 <div class="vgrid">
-                  <button class="vb" type="button" id="btnPath" aria-pressed="true">Bahn</button>
+                  <button class="vb" type="button" id="btnPath" aria-pressed="false">Bahn</button>
                   <button class="vb" type="button" id="btnMachine" aria-pressed="true" hidden>Maschine</button>
                   <button class="vb" type="button" id="btnTable" aria-pressed="true" hidden>Tisch</button>
                   <button class="vb" type="button" id="btnWks" aria-pressed="true" hidden title="Maschinennullpunkt M und Werkstücknullpunkt W mit Achsen">Koordinatensysteme</button>
                   <button class="vb" type="button" id="btnCols" aria-pressed="true" hidden>Werkzeugfarben</button>
                   <button class="vb" type="button" id="btnChips" aria-pressed="true" hidden>Späne</button>
                   <button class="vb" type="button" id="btnCool" aria-pressed="true" hidden>Kühlmittel</button>
-                  <button class="vb" type="button" id="btnSound" aria-pressed="true">Ton</button>
+                  <button class="vb" type="button" id="btnSound" aria-pressed="false">Ton</button>
                   <button class="vb" type="button" id="btnOrtho" aria-pressed="false">Parallel</button>
                 </div>
               </div>
             </div>
-            <div class="overlay legend" aria-hidden="true">
+            <div class="overlay legend" id="pathLegend" aria-hidden="true">
               <span><i style="border-top:2px dashed #e6474d"></i>G0</span>
               <span><i style="border-color:#12b887"></i>G1</span>
               <span><i style="border-color:#4dabf7"></i>G2</span>
@@ -2897,7 +2897,8 @@ const CMDHELP = (() => {
     let s = null;
     try { s = JSON.parse(localStorage.getItem(STORE_KEY)); } catch (e) { s = null; }
     const d = clone(DEFAULTS);
-    if (!s || !s.tools) return { ...d, ...clone(EXAMPLES[0].setup), code: EXAMPLES[0].code, cur: { id: null, name: EXAMPLES[0].name }, v: 7, ui: { help: true, keys: true } };
+    // erster Start: kein Projekt geladen – leeres Programm mit Standard-Werkzeugtabelle
+    if (!s || !s.tools) return { ...d, ...clone(EXAMPLES.find(x => x.id === 'vorlage').setup), code: '', cur: { id: null, name: '' }, v: 7, ui: { help: true, keys: true } };
     if (!(s.v >= 2)) { for (const t of d.tools) if (!s.tools.some(x => x.nr === t.nr)) s.tools.push(t); s.v = 2; }
     const v0 = s.v || 0;
     if (!(v0 >= 4)) migrateMks(s); else if (v0 === 6) unshiftVise(s);
@@ -2907,7 +2908,7 @@ const CMDHELP = (() => {
       stock: { ...d.stock, ...s.stock }, zero: { ...d.zero, ...s.zero },
       machine: { ...d.machine, ...s.machine, tcp: { ...d.machine.tcp, ...(s.machine || {}).tcp } },
       tools: s.tools, code: typeof s.code === 'string' ? s.code : EXAMPLES[0].code, cur: s.cur || { id: null, name: '' },
-      showMachine: s.showMachine, showTable: s.showTable, showWks: s.showWks, showChips: s.showChips, showCoolant: s.showCoolant, showColors: s.showColors, sound: s.sound, ui: { help: true, keys: true, ...(s.ui || {}) }
+      showMachine: s.showMachine, showTable: s.showTable, showWks: s.showWks, showChips: s.showChips, showCoolant: s.showCoolant, showColors: s.showColors, showPath: s.showPath, sound: s.sound, ui: { help: true, keys: true, ...(s.ui || {}) }
     };
   }
   function migrateMks(s) {
@@ -3575,7 +3576,7 @@ const CMDHELP = (() => {
     const setup = name === 'tools' || name === 'stock';
     $('skApply').style.visibility = $('skCancel').style.visibility = setup ? 'visible' : 'hidden';
     if (name === 'prog') { renderEditor(); updateHelp(); }
-    if (name === 'sim') { renderPlist(); }
+    if (name === 'sim') { renderPlist(); GFX.dirty = true; }
     if (name === 'tools') TOOLED.enter();
     if (name === 'stock') STOCKED.enter();
     if (name === 'files') renderFiles();
@@ -3993,7 +3994,7 @@ const CMDHELP = (() => {
   if (!Array.isArray(LIB)) LIB = [];
   if (!S.cur) S.cur = { id: null, name: '' };
   function saveLib() { try { localStorage.setItem(LIB_KEY, JSON.stringify(LIB)); return true; } catch (e) { return false; } }
-  function curName() { return (S.cur.name || '').trim() || progName(); }
+  function curName() { return (S.cur.name || '').trim() || (ta.value.trim() ? progName() : 'Kein Projekt geladen'); }
   function setCur(id, name) { S.cur = { id, name: name || '' }; saveState(); $('pname').textContent = curName(); }
   function fileName() {
     let base = (S.cur.name || '').trim();
@@ -4211,7 +4212,8 @@ const CMDHELP = (() => {
     try { gl = canvas.getContext('webgl2', opt); } catch (e) { glWhy = e.message; }
     if (gl) break;
   }
-  const GFX = { dirty: true, toolMeshes: {}, showPath: true, buildStock() {}, buildFixture() {}, buildPath() {}, fit() {} };
+  function syncPath() { $('btnPath').setAttribute('aria-pressed', String(GFX.showPath)); $('pathLegend').hidden = !GFX.showPath; }
+  const GFX = { dirty: true, toolMeshes: {}, showPath: S.showPath === true, buildStock() {}, buildFixture() {}, buildPath() {}, fit() {} };
   const cam = { yaw: -2.2, pitch: 0.62, dist: 260, target: [100, 70, 10], ortho: false, fov: 38 * Math.PI / 180 };
 
   /* ---------- 2D-Draufsicht als Ausweichlösung ohne WebGL2 ---------- */
@@ -4342,7 +4344,7 @@ const CMDHELP = (() => {
       view.cx = wx - mx / view.s; view.cy = wy + my / view.s; GFX.dirty = true;
     }, { passive: false });
     document.querySelectorAll('[data-view="top"]').forEach(b => b.addEventListener('click', () => GFX.fit()));
-    $('btnPath').addEventListener('click', e => { GFX.showPath = !GFX.showPath; e.currentTarget.setAttribute('aria-pressed', String(GFX.showPath)); GFX.dirty = true; });
+    $('btnPath').addEventListener('click', () => { GFX.showPath = !GFX.showPath; S.showPath = GFX.showPath; saveState(); syncPath(); GFX.dirty = true; });
     new ResizeObserver(() => { GFX.dirty = true; }).observe(c2);
   }
 
@@ -4971,7 +4973,7 @@ const CMDHELP = (() => {
       GFX.fit(b.dataset.view === 'iso');
     }));
     $('btnOrtho').addEventListener('click', e => { cam.ortho = !cam.ortho; e.currentTarget.setAttribute('aria-pressed', String(cam.ortho)); GFX.dirty = true; });
-    $('btnPath').addEventListener('click', e => { GFX.showPath = !GFX.showPath; e.currentTarget.setAttribute('aria-pressed', String(GFX.showPath)); GFX.dirty = true; });
+    $('btnPath').addEventListener('click', () => { GFX.showPath = !GFX.showPath; S.showPath = GFX.showPath; saveState(); syncPath(); GFX.dirty = true; });
     GFX.showMachine = S.showMachine !== false;
     $('btnMachine').hidden = false;
     GFX.showWks = S.showWks !== false;
@@ -5189,7 +5191,7 @@ const CMDHELP = (() => {
 
   /* ---------------- Geräusche (Web Audio, synthetisch) ---------------- */
   const SND = (() => {
-    let ac = null, master, spin = {}, cut = {}, rap = {}, cool = {}, on = S.sound !== false, cutLvl = 0, lastRem = 0;
+    let ac = null, master, spin = {}, cut = {}, rap = {}, cool = {}, on = S.sound === true, cutLvl = 0, lastRem = 0;
     function noiseBuf() {
       const b = ac.createBuffer(1, ac.sampleRate * 2, ac.sampleRate), d = b.getChannelData(0);
       for (let i = 0; i < d.length; i++) d[i] = Math.random() * 2 - 1;
@@ -5310,7 +5312,7 @@ const CMDHELP = (() => {
 
   for (const el of document.querySelectorAll('.plist, .msglist, .helpdock, .exlist, .helpwrap')) touchScroll(el, tapClick);
   /* ---------------- Start ---------------- */
-  setMO(); applyMat(); applyUiToggles();
+  setMO(); applyMat(); applyUiToggles(); syncPath();
   interpret(true);
   GFX.fit(true);
   show('prog');
