@@ -4668,7 +4668,7 @@ const CMDHELP = (() => {
       cylGeo(gh, sx, sy + 20, 440, 452, 40, CAST, 48);
       // Kühlmittelschlauch (Gliederschlauch) mit Düse, zielt auf die Werkzeugschneide
       for (let k = 0; k <= 14; k++) {
-        const u = k / 14, bx = 62 - 34 * u * u, by = -64 + 36 * u * u, bz = 62 - 50 * u;
+        const u = k / 14, bx = 62 - 34 * u * u, by = -64 + 36 * u * u, bz = 56 - 86 * u + 10 * u * u;
         cylGeo(gh, sx + bx, sy + by, bz - 3, bz + 3, k === 14 ? 4 : 6.5, k % 2 ? [0.16, 0.42, 0.8] : [0.22, 0.5, 0.88], 14);
       }
       GFX.mach = {
@@ -4763,7 +4763,7 @@ const CMDHELP = (() => {
         // Kühlmittelstrahl aus der Düse zur Werkzeugspitze
         if (GFX.showCoolant && run && cs.m.coolant && tl) {
           const P = PAL.toolOutline(tl), Lt = P[P.length - 1].z;
-          const nx = cs.pos.x + 28, ny = cs.pos.y - 28, nz = cs.pos.z + Lt + 12;
+          const nx = cs.pos.x + 28, ny = cs.pos.y - 28, nz = cs.pos.z + Lt - 20;
           const tx = cs.pos.x, ty = cs.pos.y, tz = cs.pos.z + Math.min(4, tl.lc * 0.3);
           let dx = tx - nx, dy = ty - ny, dz = tz - nz; const L = Math.hypot(dx, dy, dz) || 1; dx /= L; dy /= L; dz /= L;
           wAcc += dt * 900;
